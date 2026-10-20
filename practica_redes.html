@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Examen Semana 10 - Direccionamiento IPv4</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.12);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
+      --warning: #f59e0b;
+      --purple: #8b5cf6;
+      --purple-hover: #7c3aed;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; line-height: 1.5; }
+    .container { max-width: 920px; margin: 0 auto; }
+    h1 { text-align: center; color: #60a5fa; margin-bottom: 5px; }
+    .subtitle { text-align: center; color: var(--muted); margin-bottom: 20px; font-size: 0.95rem; }
+    
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; align-items: center; }
+    .tab-btn {
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+      padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover { background: var(--primary); border-color: var(--primary); }
+    .tab-exam {
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      color: white; border: none; padding: 11px 18px; border-radius: 8px;
+      cursor: pointer; font-weight: 700; transition: 0.2s; box-shadow: 0 4px 12px rgba(139,92,246,0.35);
+    }
+    .tab-exam.active, .tab-exam:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); margin-bottom: 20px;
+    }
+    .question-box {
+      background: #090d16; border-left: 4px solid var(--primary);
+      padding: 16px; border-radius: 6px; font-size: 1.1rem; margin-bottom: 18px;
+    }
+    .highlight { color: #38bdf8; font-weight: bold; font-family: monospace; font-size: 1.2rem; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-bottom: 18px; }
+    .field-wrap { display: flex; flex-direction: column; }
+    label { display: block; font-size: 0.88rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    input {
+      width: 100%; padding: 10px 12px; background: #0f172a; border: 2px solid var(--border);
+      color: var(--text); border-radius: 6px; font-size: 0.98rem; font-family: monospace; transition: 0.2s;
+    }
+    input:focus { outline: none; border-color: var(--primary); }
+    
+    input.input-ok { border-color: var(--success) !important; background-color: var(--success-bg) !important; }
+    input.input-bad { border-color: var(--danger) !important; background-color: var(--danger-bg) !important; }
+    input.input-solution { border-color: var(--warning) !important; background-color: rgba(245, 158, 11, 0.14) !important; color: #fde68a !important; }
+
+    .field-status { font-size: 0.8rem; font-weight: 600; margin-top: 5px; min-height: 18px; }
+    .status-ok { color: var(--success); }
+    .status-bad { color: #f87171; }
+    .status-sol { color: #fbbf24; }
+
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold;
+      cursor: pointer; font-size: 0.98rem; transition: 0.2s;
+    }
+    .btn-check { background: var(--success); color: #052e16; }
+    .btn-check:hover { filter: brightness(1.1); }
+    .btn-next { background: var(--primary); color: white; }
+    .btn-next:hover { background: var(--primary-hover); }
+    .btn-solve { background: transparent; border: 1.5px solid var(--warning); color: var(--warning); }
+    .btn-solve:hover { background: rgba(245, 158, 11, 0.15); }
+    .btn-solve.showing { background: var(--warning); color: #0f172a; }
+
+    .feedback {
+      margin-top: 18px; padding: 16px; border-radius: 8px; display: none;
+      background: #0f172a; border: 1px solid var(--border); font-size: 0.95rem;
+    }
+    .feedback.ok { border-left: 5px solid var(--success); }
+    .feedback.bad { border-left: 5px solid var(--danger); }
+    .feedback.sol { border-left: 5px solid var(--warning); }
+
+    .cheat-toggle {
+      background: transparent; color: #fbbf24; border: 1px dashed #fbbf24;
+      padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px;
+    }
+    .cheatsheet {
+      display: none; background: #090d16; padding: 15px; border-radius: 8px;
+      margin-bottom: 20px; font-size: 0.88rem; border: 1px solid #fbbf24;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-family: monospace; }
+    th, td { border: 1px solid var(--border); padding: 6px; text-align: center; }
+    th { background: #1e293b; color: #38bdf8; }
+    .hint-item { margin-bottom: 8px; color: #fca5a5; }
+
+    /* Estilos del Modo Examen */
+    .exam-item {
+      background: #131c31; border: 1px solid var(--border); border-radius: 10px;
+      padding: 18px; margin-bottom: 18px;
+    }
+    .exam-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px;
+    }
+    .exam-q-num { font-weight: bold; color: #a78bfa; font-size: 1.05rem; }
+    .exam-q-score { font-family: monospace; font-size: 0.95rem; color: var(--muted); }
+    .score-banner {
+      display: none; padding: 20px; border-radius: 12px; text-align: center;
+      margin-bottom: 22px; background: #090d16; border: 2px solid var(--purple);
+    }
+    .score-big { font-size: 2.6rem; font-weight: 800; margin: 5px 0; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Simulador de Examen IPv4 (Semana 9 / 10)</h1>
+  <div class="subtitle">Practica por tema o rinde un Simulacro de 10 preguntas con nota vigesimal (/20)</div>
+
+  <div style="text-align: center;">
+    <button class="cheat-toggle" onclick="toggleCheat()">Mostrar / Ocultar "Coquito" (Tabla de Bits para memorizar)</button>
+  </div>
+
+  <div id="cheatsheet" class="cheatsheet">
+    <strong>Tabla de conversión de 1 Octeto (8 bits) y Saltos de Red:</strong>
+    <table>
+      <tr>
+        <th>Bits (1s)</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th>
+      </tr>
+      <tr>
+        <td><strong>Decimal</strong></td><td>128</td><td>192</td><td>224</td><td>240</td><td>248</td><td>252</td><td>254</td><td>255</td>
+      </tr>
+      <tr>
+        <td><strong>Último Bit (Salto)</strong></td><td>128</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td>
+      </tr>
+    </table>
+    <div style="margin-top:8px; color:#94a3b8;">
+      * <strong>Clases:</strong> A (1-127, /8) | B (128-191, /16) | C (192-223, /24) | D (224-239, Multicast) | E (240-255, NASA)<br>
+      * <strong>Fórmula Hosts:</strong> 2^N - 2 (donde N = ceros sobrantes) | <strong>Prefijo:</strong> 32 - N
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab_1" onclick="setMode(1)">1. Clases y Porciones</button>
+    <button class="tab-btn" id="tab_2" onclick="setMode(2)">2. Prefijos y Máscaras</button>
+    <button class="tab-btn" id="tab_3" onclick="setMode(3)">3. Cálculo de Hosts y Bits</button>
+    <button class="tab-btn" id="tab_4" onclick="setMode(4)">4. Red Base y Broadcast</button>
+    <button class="tab-exam" id="tab_5" onclick="setMode(5)">Simulacro Examen (10 Preguntas / Nota 20)</button>
+  </div>
+
+  <!-- VISTA MODO PRÁCTICA (1 al 4) -->
+  <div id="practice_view" class="card">
+    <div id="question" class="question-box"></div>
+    <div id="inputs" class="form-grid"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkSingle()">Comprobar Respuesta</button>
+      <button class="btn btn-solve" id="btn_solve_single" onclick="toggleSolutionSingle()">Ver Solución Completa</button>
+      <button class="btn btn-next" onclick="generateSingleExercise()">Refrescar / Otro Ejercicio</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+
+  <!-- VISTA MODO EXAMEN (10 Preguntas mezcladas) -->
+  <div id="exam_view" class="card" style="display: none;">
+    <div id="exam_score_banner" class="score-banner"></div>
+    <div id="exam_questions_container"></div>
+    <div class="actions" style="justify-content: center; margin-top: 20px;">
+      <button class="btn btn-check" onclick="gradeExam()">Calificar Examen (Sobre 20)</button>
+      <button class="btn btn-solve" id="btn_solve_exam" onclick="toggleSolutionExam()">Ver Solución Completa</button>
+      <button class="btn btn-next" onclick="generateExam()">Generar Nuevo Examen de 10 Preguntas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMode = 1;
+let singleProblem = null;
+let showingSolutionSingle = false;
+let savedUserInputsSingle = {};
+
+let examProblems = [];
+let showingSolutionExam = false;
+let savedUserInputsExam = {};
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function prefixToMask(prefix) {
+  let mask = [];
+  for (let i = 0; i < 4; i++) {
+    let bits = Math.min(8, Math.max(0, prefix - i * 8));
+    mask.push(bits === 0 ? 0 : 256 - Math.pow(2, 8 - bits));
+  }
+  return mask.join('.');
+}
+
+function toggleCheat() {
+  const el = document.getElementById('cheatsheet');
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+function setMode(m) {
+  currentMode = m;
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('tab_' + i).classList.toggle('active', i === m);
+  }
+  document.getElementById('tab_5').classList.toggle('active', m === 5);
+
+  if (m === 5) {
+    document.getElementById('practice_view').style.display = 'none';
+    document.getElementById('exam_view').style.display = 'block';
+    generateExam();
+  } else {
+    document.getElementById('exam_view').style.display = 'none';
+    document.getElementById('practice_view').style.display = 'block';
+    generateSingleExercise();
+  }
+}
+
+// Generador universal de un problema de tipo 1, 2, 3 o 4 con prefijo único de IDs
+function createProblemData(type, idPrefix) {
+  if (type === 1) {
+    const classes = ['A', 'B', 'C'];
+    const chosen = classes[rand(0, 2)];
+    let o1 = chosen === 'A' ? rand(1, 126) : (chosen === 'B' ? rand(128, 191) : rand(192, 223));
+    let o2 = rand(1, 250), o3 = rand(1, 250), o4 = rand(1, 250);
+    let ip = `${o1}.${o2}.${o3}.${o4}`;
+    let netPortion = chosen === 'A' ? `${o1}` : (chosen === 'B' ? `${o1}.${o2}` : `${o1}.${o2}.${o3}`);
+    let hostPortion = chosen === 'A' ? `${o2}.${o3}.${o4}` : (chosen === 'B' ? `${o3}.${o4}` : `${o4}`);
+    let defMask = chosen === 'A' ? '255.0.0.0' : (chosen === 'B' ? '255.255.0.0' : '255.255.255.0');
+
+    return {
+      type: 1, idPrefix, ip, chosen, netPortion, hostPortion, defMask, o1,
+      title: 'Clases y Porciones de Red/Host',
+      questionHtml: `Dada la dirección IP con clase: <span class="highlight">${ip}</span><br>Calcula su clase, máscara por defecto, porción de red y porción de host (separa con puntos, ej. <code>170.85</code>):`,
+      fields: [
+        { id: `${idPrefix}_class`, label: 'Clase (A, B o C)', placeholder: 'Ej: B', answer: chosen, norm: v => v.trim().toUpperCase() },
+        { id: `${idPrefix}_mask`, label: 'Máscara por defecto', placeholder: 'Ej: 255.255.0.0', answer: defMask, norm: v => v.trim() },
+        { id: `${idPrefix}_net`, label: 'Porción de Red', placeholder: 'Ej: 170.85', answer: netPortion, norm: v => v.trim() },
+        { id: `${idPrefix}_host`, label: 'Porción de Host', placeholder: 'Ej: 96.200', answer: hostPortion, norm: v => v.trim() }
+      ]
+    };
+  } 
+  else if (type === 2) {
+    const prefix = rand(8, 30);
+    const mask = prefixToMask(prefix);
+    const askDecimal = Math.random() > 0.4;
+    const octets = mask.split('.').map(Number);
+    let activeOctetIdx = Math.floor((prefix - 1) / 8);
+    let bitsInActive = prefix - (activeOctetIdx * 8);
+
+    return {
+      type: 2, idPrefix, prefix, mask, askDecimal, activeOctetIdx, bitsInActive, octVal: octets[activeOctetIdx],
+      title: 'Conversión de Prefijo y Máscara',
+      questionHtml: askDecimal
+        ? `Convierte el prefijo de máscara <span class="highlight">/${prefix}</span> a su formato decimal:`
+        : `Convierte la máscara <span class="highlight">${mask}</span> a notación de longitud de prefijo (/X):`,
+      fields: askDecimal
+        ? [{ id: `${idPrefix}_val`, label: 'Máscara en Decimal', placeholder: 'Ej: 255.255.248.0', answer: mask, norm: v => v.trim() }]
+        : [{ id: `${idPrefix}_val`, label: 'Longitud de Prefijo (/X)', placeholder: 'Ej: /21 o 21', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') }]
+    };
+  } 
+  else if (type === 3) {
+    const subType = Math.random() > 0.5 ? 'maskToHosts' : 'hostsToMask';
+    if (subType === 'maskToHosts') {
+      const prefix = rand(14, 30);
+      const mask = prefixToMask(prefix);
+      const zeros = 32 - prefix;
+      const totalHosts = Math.pow(2, zeros) - 2;
+      const showAsPrefix = Math.random() > 0.5;
+
+      return {
+        type: 3, subType, idPrefix, prefix, mask, zeros, totalHosts,
+        title: 'Cálculo de Cantidad de Hosts',
+        questionHtml: `¿Para cuántos <strong>hosts (IPs válidas)</strong> alcanza la máscara <span class="highlight">${showAsPrefix ? '/' + prefix : mask}</span>?`,
+        fields: [
+          { id: `${idPrefix}_hosts`, label: 'Cantidad de Hosts válidos (2^N - 2)', placeholder: 'Ej: 2046', answer: String(totalHosts), norm: v => v.replace(/\D/g, '') }
+        ]
+      };
+    } else {
+      const nBits = rand(3, 15);
+      const maxCap = Math.pow(2, nBits) - 2;
+      const minCap = Math.pow(2, nBits - 1) - 1;
+      const reqPCs = rand(Math.max(2, minCap + 1), maxCap - 1);
+      const prefix = 32 - nBits;
+      const mask = prefixToMask(prefix);
+
+      return {
+        type: 3, subType, idPrefix, nBits, maxCap, reqPCs, prefix, mask,
+        title: 'Diseño de Máscara según Hosts (Bits prestados)',
+        questionHtml: `Se necesita diseñar una subred para cubrir <span class="highlight">${reqPCs.toLocaleString('es-PE')} PCs (hosts)</span>.<br>Calcula el prefijo y la máscara en formato decimal:`,
+        fields: [
+          { id: `${idPrefix}_pref`, label: 'Prefijo (/X)', placeholder: 'Ej: /26 o 26', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
+          { id: `${idPrefix}_mask`, label: 'Máscara en Decimal', placeholder: 'Ej: 255.255.255.192', answer: mask, norm: v => v.trim() }
+        ]
+      };
+    }
+  } 
+  else {
+    const usePCsPrompt = Math.random() > 0.5;
+    const prefix = rand(10, 29);
+    const nBits = 32 - prefix;
+    const mask = prefixToMask(prefix);
+
+    let o1 = rand(10, 210);
+    if (o1 === 127) o1 = 120;
+    let ipArr = [o1, rand(1, 250), rand(1, 250), rand(1, 250)];
+
+    let varIdx = Math.floor((prefix - 1) / 8);
+    let bitsUsed = prefix - varIdx * 8;
+    let step = Math.pow(2, 8 - bitsUsed);
+
+    let netArr = [...ipArr];
+    netArr[varIdx] = Math.floor(ipArr[varIdx] / step) * step;
+    for (let i = varIdx + 1; i < 4; i++) netArr[i] = 0;
+
+    let firstIpArr = [...netArr];
+    firstIpArr[3] += 1;
+
+    let nextNetArr = [...netArr];
+    nextNetArr[varIdx] += step;
+    for (let i = varIdx; i > 0; i--) {
+      if (nextNetArr[i] >= 256) {
+        nextNetArr[i] -= 256;
+        nextNetArr[i - 1] += 1;
+      }
+    }
+
+    let bcastArr = [...netArr];
+    bcastArr[varIdx] += step - 1;
+    for (let i = varIdx + 1; i < 4; i++) bcastArr[i] = 255;
+
+    let lastIpArr = [...bcastArr];
+    lastIpArr[3] -= 1;
+
+    let reqPCs = rand(Math.pow(2, nBits - 1) + 1, Math.pow(2, nBits) - 2);
+    let datoExtra = usePCsPrompt 
+      ? `para <span class="highlight">${reqPCs.toLocaleString('es-PE')} PCs</span> (halla primero la máscara)`
+      : `con máscara <span class="highlight">${Math.random() > 0.5 ? '/' + prefix : mask}</span>`;
+
+    return {
+      type: 4, idPrefix, ip: ipArr.join('.'), prefix, mask, varIdx, step, reqPCs, usePCsPrompt, nBits,
+      net: netArr.join('.'), firstIp: firstIpArr.join('.'), lastIp: lastIpArr.join('.'),
+      bcast: bcastArr.join('.'), nextNet: nextNetArr.join('.'),
+      title: 'Cálculo Completo de Red, Rangos y Broadcast',
+      questionHtml: `Se tiene el IP <span class="highlight">${ipArr.join('.')}</span> ${datoExtra}.<br>Calcula todos los datos solicitados:`,
+      fields: [
+        { id: `${idPrefix}_net`, label: '1. Red Base', placeholder: 'X.X.X.X', answer: netArr.join('.'), norm: v => v.trim() },
+        { id: `${idPrefix}_first`, label: '2. Primer IP Válido (Gateway)', placeholder: 'X.X.X.X', answer: firstIpArr.join('.'), norm: v => v.trim() },
+        { id: `${idPrefix}_last`, label: '3. Último IP Válido', placeholder: 'X.X.X.X', answer: lastIpArr.join('.'), norm: v => v.trim() },
+        { id: `${idPrefix}_bcast`, label: '4. Broadcast', placeholder: 'X.X.X.X', answer: bcastArr.join('.'), norm: v => v.trim() },
+        { id: `${idPrefix}_next`, label: '5. Siguiente Red', placeholder: 'X.X.X.X', answer: nextNetArr.join('.'), norm: v => v.trim() }
+      ]
+    };
+  }
+}
+
+function renderFieldsHtml(fields) {
+  return fields.map(f => `
+    <div class="field-wrap">
+      <label for="${f.id}">${f.label}</label>
+      <input id="${f.id}" placeholder="${f.placeholder}" oninput="clearFieldStatus('${f.id}')">
+      <div id="status_${f.id}" class="field-status"></div>
+    </div>
+  `).join('');
+}
+
+function clearFieldStatus(id) {
+  const inp = document.getElementById(id);
+  const st = document.getElementById('status_' + id);
+  if (inp) inp.classList.remove('input-ok', 'input-bad', 'input-solution');
+  if (st) { st.innerHTML = ''; st.className = 'field-status'; }
+}
+
+// Evalúa un problema individual, pinta las casillas y devuelve cuántos campos acertó y el feedback
+function evaluateProblem(prob) {
+  let correctCount = 0;
+  let results = {};
+
+  prob.fields.forEach(f => {
+    const inp = document.getElementById(f.id);
+    const st = document.getElementById('status_' + f.id);
+    const userVal = f.norm(inp.value);
+    const ansVal = f.norm(f.answer);
+    const isOk = (userVal !== '' && userVal !== '/' && userVal === ansVal);
+
+    results[f.id] = isOk;
+    if (isOk) correctCount++;
+
+    inp.classList.remove('input-ok', 'input-bad', 'input-solution');
+    if (isOk) {
+      inp.classList.add('input-ok');
+      st.className = 'field-status status-ok';
+      st.innerHTML = '✓ ¡Correcto!';
+    } else {
+      inp.classList.add('input-bad');
+      st.className = 'field-status status-bad';
+      st.innerHTML = '✗ Incorrecto (corrige este dato)';
+    }
+  });
+
+  const allOk = (correctCount === prob.fields.length);
+  let html = '';
+
+  if (allOk) {
+    html = `<strong>¡Excelente! Todo correcto en este ejercicio:</strong><br>${getFullExplanationHtml(prob)}`;
+  } else {
+    html = `<strong>Pistas para corregir las casillas en rojo:</strong><br>${getHintsHtml(prob, results)}`;
+  }
+
+  return { allOk, correctCount, totalFields: prob.fields.length, html };
+}
+
+function getFullExplanationHtml(p) {
+  if (p.type === 1) {
+    return `• <strong>Clase ${p.chosen}:</strong> 1er octeto es <code>${p.o1}</code>. | <strong>Máscara:</strong> <code>${p.defMask}</code> | <strong>Porción Red:</strong> <code>${p.netPortion}</code> | <strong>Porción Host:</strong> <code>${p.hostPortion}</code>.`;
+  } else if (p.type === 2) {
+    return `• El prefijo <strong>/${p.prefix}</strong> equivale a <strong>${p.mask}</strong> (${p.bitsInActive} bits encendidos en el octeto #${p.activeOctetIdx + 1} = <code>${p.octVal}</code>).`;
+  } else if (p.type === 3) {
+    if (p.subType === 'maskToHosts') {
+      return `• Máscara <code>/${p.prefix}</code> deja <code>N = ${p.zeros} ceros</code> &rarr; <code>2^${p.zeros} - 2 = <strong>${p.totalHosts.toLocaleString('es-PE')} hosts</strong></code>.`;
+    } else {
+      return `• Para ${p.reqPCs.toLocaleString('es-PE')} PCs: potencia <code>2^${p.nBits} - 2 = ${p.maxCap.toLocaleString('es-PE')}</code> &rarr; Prefijo <code>32 - ${p.nBits} = <strong>/${p.prefix}</strong></code> (<code>${p.mask}</code>).`;
+    }
+  } else {
+    return `• <strong>Máscara:</strong> <code>/${p.prefix}</code> (<code>${p.mask}</code>), varía en el octeto #${p.varIdx + 1} de <strong>${p.step} en ${p.step}</strong>.<br>
+            • <strong>Red Base:</strong> <code>${p.net}</code> | <strong>1er IP:</strong> <code>${p.firstIp}</code> | <strong>Último IP:</strong> <code>${p.lastIp}</code> | <strong>Broadcast:</strong> <code>${p.bcast}</code> | <strong>Siguiente Red:</strong> <code>${p.nextNet}</code>.`;
+  }
+}
+
+function getHintsHtml(p, res) {
+  let h = '';
+  if (p.type === 1) {
+    if (!res[`${p.idPrefix}_class`]) h += `<div class="hint-item">✗ <strong>Clase:</strong> Mira el primer número (<code>${p.o1}</code>). A: 1-127, B: 128-191, C: 192-223.</div>`;
+    if (!res[`${p.idPrefix}_mask`]) h += `<div class="hint-item">✗ <strong>Máscara:</strong> Clase A lleva un 255 (<code>255.0.0.0</code>), Clase B dos 255 (<code>255.255.0.0</code>), Clase C tres 255 (<code>255.255.255.0</code>).</div>`;
+    if (!res[`${p.idPrefix}_net`]) h += `<div class="hint-item">✗ <strong>Porción de Red:</strong> Copia los octetos de la IP donde la máscara tiene <code>255</code>.</div>`;
+    if (!res[`${p.idPrefix}_host`]) h += `<div class="hint-item">✗ <strong>Porción de Host:</strong> Copia los octetos de la IP donde la máscara tiene <code>0</code>.</div>`;
+  } else if (p.type === 2) {
+    h += `<div class="hint-item">✗ Tienes ${p.activeOctetIdx} octetos con 255 (${p.activeOctetIdx * 8} bits) y <strong>${p.bitsInActive} bits encendidos</strong> en el octeto #${p.activeOctetIdx + 1}. Revisa en la tabla cuánto valen ${p.bitsInActive} bits.</div>`;
+  } else if (p.type === 3) {
+    if (p.subType === 'maskToHosts') {
+      h += `<div class="hint-item">✗ La máscara equivale a <code>/${p.prefix}</code>. Resta <code>32 - ${p.prefix}</code> para hallar los ceros (N) y calcula <code>2^N - 2</code>.</div>`;
+    } else {
+      if (!res[`${p.idPrefix}_pref`]) h += `<div class="hint-item">✗ <strong>Prefijo:</strong> Busca qué potencia <code>2^N - 2</code> cubre ${p.reqPCs.toLocaleString('es-PE')} PCs y resta <code>32 - N</code>.</div>`;
+      if (!res[`${p.idPrefix}_mask`]) h += `<div class="hint-item">✗ <strong>Máscara Decimal:</strong> Convierte el prefijo <code>/${p.prefix}</code> a decimal usando la tabla de bits.</div>`;
+    }
+  } else {
+    if (!res[`${p.idPrefix}_net`]) h += `<div class="hint-item">✗ <strong>1. Red Base:</strong> La máscara es <code>/${p.prefix}</code> (<code>${p.mask}</code>). Varía en el octeto #${p.varIdx + 1} de <strong>${p.step} en ${p.step}</strong>. Busca el múltiplo de ${p.step} más cercano sin pasarte y rellena con <code>.0</code> a la derecha.</div>`;
+    if (!res[`${p.idPrefix}_first`]) h += `<div class="hint-item">✗ <strong>2. Primer IP:</strong> Súmale <code>+1</code> a la Red Base únicamente en el 4to octeto.</div>`;
+    if (!res[`${p.idPrefix}_next`]) h += `<div class="hint-item">✗ <strong>5. Siguiente Red:</strong> Súmale el salto (<code>+${p.step}</code>) a la Red Base en el octeto #${p.varIdx + 1}.</div>`;
+    if (!res[`${p.idPrefix}_bcast`]) h += `<div class="hint-item">✗ <strong>4. Broadcast:</strong> Réstale 1 al octeto #${p.varIdx + 1} de la Siguiente Red y pon <code>255</code> en los octetos cero de la derecha.</div>`;
+    if (!res[`${p.idPrefix}_last`]) h += `<div class="hint-item">✗ <strong>3. Último IP:</strong> Réstale <code>-1</code> al Broadcast únicamente en el 4to octeto.</div>`;
+  }
+  return h;
+}
+
+/* ================= MODO PRÁCTICA INDIVIDUAL (1 al 4) ================= */
+
+function generateSingleExercise() {
+  showingSolutionSingle = false;
+  savedUserInputsSingle = {};
+  const btnSolve = document.getElementById('btn_solve_single');
+  btnSolve.textContent = 'Ver Solución Completa';
+  btnSolve.classList.remove('showing');
+
+  singleProblem = createProblemData(currentMode, 'single');
+  document.getElementById('question').innerHTML = singleProblem.questionHtml;
+  document.getElementById('inputs').innerHTML = renderFieldsHtml(singleProblem.fields);
+  document.getElementById('feedback').style.display = 'none';
+}
+
+function checkSingle() {
+  // Si estaba viendo la solución, primero salimos del modo solución sin borrar lo actual
+  if (showingSolutionSingle) {
+    showingSolutionSingle = false;
+    const btnSolve = document.getElementById('btn_solve_single');
+    btnSolve.textContent = 'Ver Solución Completa';
+    btnSolve.classList.remove('showing');
+  }
+
+  const fbEl = document.getElementById('feedback');
+  fbEl.style.display = 'block';
+  const evalRes = evaluateProblem(singleProblem);
+  fbEl.className = 'feedback ' + (evalRes.allOk ? 'ok' : 'bad');
+  fbEl.innerHTML = evalRes.html;
+}
+
+function toggleSolutionSingle() {
+  const btnSolve = document.getElementById('btn_solve_single');
+  const fbEl = document.getElementById('feedback');
+
+  if (!showingSolutionSingle) {
+    // Guardar respuestas actuales del usuario antes de mostrar la solución
+    savedUserInputsSingle = {};
+    singleProblem.fields.forEach(f => {
+      const inp = document.getElementById(f.id);
+      savedUserInputsSingle[f.id] = inp ? inp.value : '';
+      inp.value = f.answer;
+      inp.classList.remove('input-ok', 'input-bad');
+      inp.classList.add('input-solution');
+      const st = document.getElementById('status_' + f.id);
+      st.className = 'field-status status-sol';
+      st.innerHTML = '★ Solución mostrada';
+    });
+
+    showingSolutionSingle = true;
+    btnSolve.textContent = 'Ocultar Solución (Volver a mis respuestas)';
+    btnSolve.classList.add('showing');
+
+    fbEl.style.display = 'block';
+    fbEl.className = 'feedback sol';
+    fbEl.innerHTML = `<strong>Solución Completa (Presiona de nuevo el botón amarillo para regresar a tus respuestas):</strong><br><br>${getFullExplanationHtml(singleProblem)}`;
+  } else {
+    // Restaurar las respuestas que tenía el usuario y re-evaluar qué tenía bien o mal
+    singleProblem.fields.forEach(f => {
+      const inp = document.getElementById(f.id);
+      if (inp && savedUserInputsSingle[f.id] !== undefined) {
+        inp.value = savedUserInputsSingle[f.id];
+      }
+      clearFieldStatus(f.id);
+    });
+
+    showingSolutionSingle = false;
+    btnSolve.textContent = 'Ver Solución Completa';
+    btnSolve.classList.remove('showing');
+
+    // Re-evaluamos si el usuario ya había escrito algo, o escondemos si estaba vacío
+    const hasAnyInput = Object.values(savedUserInputsSingle).some(v => v.trim() !== '');
+    if (hasAnyInput) {
+      checkSingle();
+    } else {
+      fbEl.style.display = 'none';
+    }
+  }
+}
+
+/* ================= MODO SIMULACRO DE EXAMEN (10 PREGUNTAS / NOTA 20) ================= */
+
+function generateExam() {
+  showingSolutionExam = false;
+  savedUserInputsExam = {};
+  const btnSolve = document.getElementById('btn_solve_exam');
+  btnSolve.textContent = 'Ver Solución Completa';
+  btnSolve.classList.remove('showing');
+
+  const banner = document.getElementById('exam_score_banner');
+  banner.style.display = 'none';
+
+  // Distribución equilibrada de 10 preguntas de los 4 temas (2 del T1, 2 del T2, 3 del T3, 3 del T4) y mezcladas
+  const typesPool = [1, 1, 2, 2, 3, 3, 3, 4, 4, 4];
+  for (let i = typesPool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [typesPool[i], typesPool[j]] = [typesPool[j], typesPool[i]];
+  }
+
+  examProblems = typesPool.map((t, idx) => createProblemData(t, `ex_q${idx}`));
+
+  const container = document.getElementById('exam_questions_container');
+  container.innerHTML = examProblems.map((p, idx) => `
+    <div class="exam-item">
+      <div class="exam-header">
+        <span class="exam-q-num">Pregunta ${idx + 1}: ${p.title}</span>
+        <span class="exam-q-score" id="score_ex_q${idx}">Valor: 2.0 pts</span>
+      </div>
+      <div class="question-box" style="margin-bottom: 14px; font-size: 1.02rem;">${p.questionHtml}</div>
+      <div class="form-grid" style="margin-bottom: 8px;">${renderFieldsHtml(p.fields)}</div>
+      <div id="fb_ex_q${idx}" class="feedback"></div>
+    </div>
+  `).join('');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function gradeExam() {
+  if (showingSolutionExam) {
+    showingSolutionExam = false;
+    const btnSolve = document.getElementById('btn_solve_exam');
+    btnSolve.textContent = 'Ver Solución Completa';
+    btnSolve.classList.remove('showing');
+  }
+
+  let totalScore = 0;
+
+  examProblems.forEach((p, idx) => {
+    const evalRes = evaluateProblem(p);
+    // Cada pregunta vale 2 puntos (proporcional a los campos acertados dentro de la pregunta)
+    const qScore = (evalRes.correctCount / evalRes.totalFields) * 2;
+    totalScore += qScore;
+
+    const scoreLabel = document.getElementById(`score_ex_q${idx}`);
+    scoreLabel.innerHTML = `Puntaje: <strong style="color:${qScore === 2 ? '#10b981' : (qScore > 0 ? '#fbbf24' : '#ef4444')}">${qScore.toFixed(1)} / 2.0 pts</strong>`;
+
+    const fb = document.getElementById(`fb_ex_q${idx}`);
+    fb.style.display = 'block';
+    fb.className = 'feedback ' + (evalRes.allOk ? 'ok' : 'bad');
+    fb.innerHTML = evalRes.html;
+  });
+
+  const finalGrade = Math.round(totalScore * 10) / 10;
+  const approved = finalGrade >= 13;
+  const banner = document.getElementById('exam_score_banner');
+  banner.style.display = 'block';
+  banner.style.borderColor = approved ? 'var(--success)' : 'var(--danger)';
+
+  let msg = finalGrade >= 18 ? '¡Sobresaliente! Estás listísimo para romperla el viernes.'
+          : (finalGrade >= 13 ? '¡Aprobado! Buen dominio, corrige las casillas en rojo para llegar al 20.'
+          : 'Aún falta practicar un poco más. Revisa las pistas rojas de cada pregunta y corrígelas.');
+
+  banner.innerHTML = `
+    <div style="font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Nota Vigesimal Obtenida</div>
+    <div class="score-big" style="color: ${approved ? 'var(--success)' : 'var(--danger)'}">${finalGrade} / 20</div>
+    <div style="font-size: 1.05rem;">${msg}</div>
+  `;
+
+  banner.scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleSolutionExam() {
+  const btnSolve = document.getElementById('btn_solve_exam');
+
+  if (!showingSolutionExam) {
+    savedUserInputsExam = {};
+    examProblems.forEach((p, idx) => {
+      p.fields.forEach(f => {
+        const inp = document.getElementById(f.id);
+        savedUserInputsExam[f.id] = inp ? inp.value : '';
+        inp.value = f.answer;
+        inp.classList.remove('input-ok', 'input-bad');
+        inp.classList.add('input-solution');
+        const st = document.getElementById('status_' + f.id);
+        st.className = 'field-status status-sol';
+        st.innerHTML = '★ Solución mostrada';
+      });
+      const fb = document.getElementById(`fb_ex_q${idx}`);
+      fb.style.display = 'block';
+      fb.className = 'feedback sol';
+      fb.innerHTML = `<strong>Solución Explicada:</strong><br>${getFullExplanationHtml(p)}`;
+    });
+
+    showingSolutionExam = true;
+    btnSolve.textContent = 'Ocultar Solución (Volver a mis respuestas)';
+    btnSolve.classList.add('showing');
+  } else {
+    examProblems.forEach((p, idx) => {
+      p.fields.forEach(f => {
+        const inp = document.getElementById(f.id);
+        if (inp && savedUserInputsExam[f.id] !== undefined) {
+          inp.value = savedUserInputsExam[f.id];
+        }
+        clearFieldStatus(f.id);
+      });
+      document.getElementById(`fb_ex_q${idx}`).style.display = 'none';
+    });
+
+    showingSolutionExam = false;
+    btnSolve.textContent = 'Ver Solución Completa';
+    btnSolve.classList.remove('showing');
+
+    const hasAnyInput = Object.values(savedUserInputsExam).some(v => v.trim() !== '');
+    if (hasAnyInput) {
+      gradeExam();
+    } else {
+      document.getElementById('exam_score_banner').style.display = 'none';
+    }
+  }
+}
+
+// Iniciar al cargar
+generateSingleExercise();
+</script>
+</body>
+</html>
