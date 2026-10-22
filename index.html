@@ -35,7 +35,6 @@
     }
     .tab-btn.active, .tab-btn:hover { background: var(--primary); border-color: var(--primary); }
 
-    /* Botones especiales de entrenamiento rápido y Exámenes */
     .special-tabs { display: flex; gap: 9px; flex-wrap: wrap; justify-content: center; align-items: center; }
     .tab-table {
       background: linear-gradient(135deg, #f59e0b, #d97706);
@@ -90,42 +89,6 @@
     .status-bad { color: #f87171; }
     .status-sol { color: #fbbf24; }
 
-    /* Tablero visual interactivo estilo Cisco (128 64 32 16 8 4 2 1) */
-    .cisco-board-wrap {
-      background: #073b54; border: 2px solid #00a8e8; border-radius: 10px;
-      padding: 16px; margin-bottom: 20px; overflow-x: auto;
-    }
-    .cisco-board-title {
-      color: #7dd3fc; font-size: 0.88rem; font-weight: 700; margin-bottom: 10px; text-align: center;
-    }
-    .cisco-board {
-      display: grid; grid-template-columns: repeat(8, minmax(52px, 1fr)) auto; gap: 8px; align-items: center;
-      min-width: 560px;
-    }
-    .bit-col {
-      display: flex; flex-direction: column; align-items: center; background: #052c40;
-      border-radius: 8px; overflow: hidden; border: 1px solid #0c5478;
-    }
-    .bit-btn {
-      width: 54px; height: 54px; margin: 10px 6px; border-radius: 8px;
-      border: 2px solid #f59e0b; background: #052c40; color: #f59e0b;
-      font-size: 1.45rem; font-weight: 800; font-family: monospace; cursor: pointer; transition: 0.15s;
-    }
-    .bit-btn.on {
-      background: #f59e0b; color: #0f172a; box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-    }
-    .bit-weight {
-      width: 100%; background: #00b4d8; color: white; text-align: center;
-      padding: 6px 0; font-weight: 700; font-family: monospace; font-size: 1rem;
-    }
-    .cisco-sum-box {
-      display: flex; align-items: center; gap: 10px; padding-left: 8px; font-family: monospace;
-    }
-    .cisco-sum-val {
-      background: white; color: #052c40; font-size: 1.7rem; font-weight: 800;
-      padding: 10px 16px; border-radius: 8px; min-width: 85px; text-align: right;
-    }
-
     .actions { display: flex; gap: 12px; flex-wrap: wrap; }
     .btn {
       padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold;
@@ -160,7 +123,6 @@
     th { background: #1e293b; color: #38bdf8; }
     .hint-item { margin-bottom: 8px; color: #fca5a5; }
 
-    /* Estilos del Modo Examen */
     .exam-item {
       background: #131c31; border: 1px solid var(--border); border-radius: 10px;
       padding: 18px; margin-bottom: 18px;
@@ -182,7 +144,7 @@
 
 <div class="container">
   <h1>Simulador de Examen IPv4 e IPv6 (Semanas 9 y 10)</h1>
-  <div class="subtitle">Incluye IPs Privadas/Públicas, Subredes (2^M), Compresión IPv6 y Entrenadores de Tabla y Binario</div>
+  <div class="subtitle">Motor con Baraja Anti-Repetición: Clases, Priv/Púb, Hosts, Subredes (2^M), Binario e IPv6</div>
 
   <div style="text-align: center;">
     <button class="cheat-toggle" onclick="toggleCheat()">Mostrar / Ocultar "Coquito" Completo (Tablas, IPs Privadas, Subredes e IPv6)</button>
@@ -205,6 +167,7 @@
       </tr>
     </table>
     <div style="margin-top:10px; color:#cbd5e1;">
+      • <strong>Pesos Binarios de 1 Octeto:</strong> <code>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</code><br>
       • <strong>Clases IPv4:</strong> A (<code>1-127</code>, /8) | B (<code>128-191</code>, /16) | C (<code>192-223</code>, /24) | D (<code>224-239</code>, Multicast) | E (<code>240-255</code>, NASA).<br>
       • <strong>Rangos de IPs PRIVADAS (El resto son PÚBLICAS):</strong><br>
         &nbsp;&nbsp;- <strong>Clase A Privada:</strong> <code>10.0.0.0</code> a <code>10.255.255.255</code><br>
@@ -217,7 +180,6 @@
   </div>
 
   <div class="nav-section">
-    <!-- Los 6 apartados principales de práctica -->
     <div class="tabs">
       <button class="tab-btn active" id="tab_1" onclick="setMode(1)">1. Clases, Porciones y Priv/Púb</button>
       <button class="tab-btn" id="tab_2" onclick="setMode(2)">2. Prefijos y Máscaras</button>
@@ -226,7 +188,6 @@
       <button class="tab-btn" id="tab_5" onclick="setMode(5)">5. Cálculo Subredes (2^M)</button>
       <button class="tab-btn" id="tab_6" onclick="setMode(6)">6. IPv6 Compresión y Tipos</button>
     </div>
-    <!-- Entrenadores Rápidos (Tabla sin Clase y Conversión Binario-Decimal) + los 2 Exámenes -->
     <div class="special-tabs">
       <button class="tab-table" id="tab_7" onclick="setMode(7)">⚡ Entrenar Tabla Sin Clase</button>
       <button class="tab-binary" id="tab_8" onclick="setMode(8)">🔢 Entrenar Binario ↔ Decimal</button>
@@ -238,26 +199,6 @@
   <!-- VISTA MODO PRÁCTICA (Modos 1 al 8) -->
   <div id="practice_view" class="card">
     <div id="question" class="question-box"></div>
-
-    <!-- Tablero interactivo estilo Cisco (Solo visible en el Modo 8: Binario <-> Decimal) -->
-    <div id="binary_board_container" class="cisco-board-wrap" style="display: none;">
-      <div class="cisco-board-title">💡 TABLERO INTERACTIVO DE APOYO (Haz clic en los cuadros de 0 y 1 para encender o apagar bits y ver cómo suman):</div>
-      <div class="cisco-board">
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_0" onclick="toggleBoardBit(0)">0</button><div class="bit-weight">128</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_1" onclick="toggleBoardBit(1)">0</button><div class="bit-weight">64</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_2" onclick="toggleBoardBit(2)">0</button><div class="bit-weight">32</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_3" onclick="toggleBoardBit(3)">0</button><div class="bit-weight">16</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_4" onclick="toggleBoardBit(4)">0</button><div class="bit-weight">8</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_5" onclick="toggleBoardBit(5)">0</button><div class="bit-weight">4</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_6" onclick="toggleBoardBit(6)">0</button><div class="bit-weight">2</div></div>
-        <div class="bit-col"><button type="button" class="bit-btn" id="bbit_7" onclick="toggleBoardBit(7)">0</button><div class="bit-weight">1</div></div>
-        <div class="cisco-sum-box">
-          <span style="color:#38bdf8; font-size:1.8rem; font-weight:bold;">=</span>
-          <div class="cisco-sum-val" id="board_sum_display">0</div>
-        </div>
-      </div>
-    </div>
-
     <div id="inputs" class="form-grid"></div>
     <div class="actions">
       <button class="btn btn-check" onclick="checkSingle()">Comprobar Respuesta</button>
@@ -295,10 +236,6 @@ const TABLE_DATA = [
 ];
 
 let currentMode = 1;
-let difficultyCycle = 0;
-let lastTableOnes = -1;
-let boardBits = [0, 0, 0, 0, 0, 0, 0, 0];
-
 let singleProblem = null;
 let showingSolutionSingle = false;
 let savedUserInputsSingle = {};
@@ -315,6 +252,24 @@ function pick(arr) {
   return arr[rand(0, arr.length - 1)];
 }
 
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* SISTEMA DE BARAJAS ANTI-REPETICIÓN (SHUFFLED DECKS) */
+const decks = {};
+function drawFromDeck(deckName, itemsSource) {
+  if (!decks[deckName] || decks[deckName].length === 0) {
+    decks[deckName] = shuffleArray(itemsSource);
+  }
+  return decks[deckName].pop();
+}
+
 function decToBin8(n) {
   return n.toString(2).padStart(8, '0');
 }
@@ -328,7 +283,6 @@ function prefixToMask(prefix) {
   return mask.join('.');
 }
 
-// Verifica si una IPv4 es Privada o Pública según los 3 rangos de clase del profesor
 function isPrivateIPv4(o1, o2) {
   if (o1 === 10) return true;
   if (o1 === 172 && o2 >= 16 && o2 <= 31) return true;
@@ -336,48 +290,14 @@ function isPrivateIPv4(o1, o2) {
   return false;
 }
 
-// Normaliza texto PRIVADO / PUBLICO sin tildes y aceptando ambos géneros
 function normPrivPub(val) {
   const s = val.trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   if (s.startsWith('PRIV')) return 'PRIVADO';
   if (s.startsWith('PUB')) return 'PUBLICO';
+  if (s.startsWith('RES') || s.startsWith('MULT') || s.startsWith('NO')) return 'RESERVADO';
   return s;
 }
 
-// Funciones del Tablero Interactivo Binario (Modo 8)
-function resetBoardBits() {
-  boardBits = [0, 0, 0, 0, 0, 0, 0, 0];
-  updateBoardUI();
-}
-
-function toggleBoardBit(idx) {
-  boardBits[idx] = boardBits[idx] === 0 ? 1 : 0;
-  updateBoardUI();
-  // Si el input pide binario, podemos copiar automáticamente si el usuario quiere, o solo mostrar la suma
-  if (singleProblem && singleProblem.type === 8 && singleProblem.subType === 'decToBin') {
-    const inp = document.getElementById('single_ans');
-    if (inp) {
-      inp.value = boardBits.join('');
-      clearFieldStatus('single_ans');
-    }
-  }
-}
-
-function updateBoardUI() {
-  let sum = 0;
-  for (let i = 0; i < 8; i++) {
-    const btn = document.getElementById('bbit_' + i);
-    if (btn) {
-      btn.textContent = boardBits[i];
-      btn.classList.toggle('on', boardBits[i] === 1);
-    }
-    if (boardBits[i] === 1) sum += WEIGHTS[i];
-  }
-  const sumEl = document.getElementById('board_sum_display');
-  if (sumEl) sumEl.textContent = sum;
-}
-
-// Algoritmo oficial de Cisco para comprimir una IPv6 de 8 hextetos al formato más óptimo
 function compressIPv6Cisco(hextets) {
   const noLead = hextets.map(h => h.replace(/^0+/, '') || '0');
   let bestStart = -1, bestLen = 0;
@@ -428,81 +348,80 @@ function setMode(m) {
   } else {
     document.getElementById('exam_view').style.display = 'none';
     document.getElementById('practice_view').style.display = 'block';
-    document.getElementById('binary_board_container').style.display = (m === 8) ? 'block' : 'none';
     generateSingleExercise();
   }
 }
 
-function nextDifficulty() {
-  difficultyCycle = (difficultyCycle + 1) % 3;
-  return difficultyCycle;
-}
+/* ================= GENERADOR DE EJERCICIOS CON ALTA VARIEDAD ================= */
+function createProblemData(type, idPrefix, forcedScenario = null) {
 
-/* ================= GENERADOR DE EJERCICIOS (MODOS 1 AL 8 + ESPECIALES) ================= */
-function createProblemData(type, idPrefix, diff = null) {
-  if (diff === null) diff = nextDifficulty();
-
-  // MODO 7: ENTRENADOR DE LA TABLA DE MÁSCARA SIN CLASE (COQUITO: 0, 128, 192, 224, 240, 248, 252, 254, 255)
+  // MODO 7: ENTRENADOR DE TABLA SIN CLASE (32 COMBINACIONES EN BARAJA SIN REPETIR)
   if (type === 7) {
-    let idx = rand(0, 8);
-    if (idx === lastTableOnes) idx = (idx + rand(1, 8)) % 9;
-    lastTableOnes = idx;
-    const item = TABLE_DATA[idx];
+    const allCombos = [];
+    for (let i = 0; i <= 8; i++) {
+      allCombos.push({ idx: i, v: 'binToDec' });
+      allCombos.push({ idx: i, v: 'onesToDec' });
+      allCombos.push({ idx: i, v: 'decToOnes' });
+      allCombos.push({ idx: i, v: 'decToBin' });
+      if (i >= 1) allCombos.push({ idx: i, v: 'decToStep' });
+    }
+    const combo = drawFromDeck('deck_mode7', allCombos);
+    const item = TABLE_DATA[combo.idx];
 
-    const variant = rand(1, 10);
-    if (variant <= 4) {
+    if (combo.v === 'binToDec') {
       return {
         type: 7, subType: 'binToDec', idPrefix, item,
-        title: 'Tabla de Máscara Sin Clase (Binario a Decimal)',
+        title: 'Tabla de Máscara Sin Clase (Binario → Decimal)',
         questionHtml: `En la tabla de máscara sin clase, el octeto en binario <span class="highlight-warn">${item.bin}</span> ¿a cuánto equivale en decimal?`,
-        fields: [
-          { id: `${idPrefix}_ans`, label: 'Valor en Decimal', placeholder: 'Ej: 248', answer: String(item.dec), norm: v => v.trim() }
-        ]
+        fields: [{ id: `${idPrefix}_ans`, label: 'Valor en Decimal', placeholder: 'Ej: 248', answer: String(item.dec), norm: v => v.trim() }]
       };
-    } else if (variant <= 8) {
-      const labelUnos = item.ones === 1 ? '1 uno encendido (y 7 ceros)' : `${item.ones} unos encendidos`;
+    } else if (combo.v === 'onesToDec') {
+      const labelUnos = item.ones === 0 ? '0 unos (8 ceros apagados)' : (item.ones === 1 ? '1 bit encendido a la izquierda' : `${item.ones} unos encendidos seguidos`);
       return {
         type: 7, subType: 'onesToDec', idPrefix, item,
-        title: 'Tabla de Máscara Sin Clase (Unos a Decimal)',
-        questionHtml: `Si tienes <span class="highlight-warn">${labelUnos}</span> de izquierda a derecha en un octeto, ¿a cuánto equivale en decimal?`,
-        fields: [
-          { id: `${idPrefix}_ans`, label: 'Valor en Decimal', placeholder: 'Ej: 254', answer: String(item.dec), norm: v => v.trim() }
-        ]
+        title: 'Tabla de Máscara Sin Clase (Unos → Decimal)',
+        questionHtml: `Si tienes <span class="highlight-warn">${labelUnos}</span> en un octeto de máscara, ¿a qué número decimal equivale?`,
+        fields: [{ id: `${idPrefix}_ans`, label: 'Valor en Decimal', placeholder: 'Ej: 254', answer: String(item.dec), norm: v => v.trim() }]
       };
-    } else if (variant === 9) {
+    } else if (combo.v === 'decToOnes') {
       return {
         type: 7, subType: 'decToOnes', idPrefix, item,
-        title: 'Tabla de Máscara Sin Clase (Decimal a Unos)',
-        questionHtml: `El valor decimal <span class="highlight-warn">${item.dec}</span> de una máscara, ¿a cuántos <strong>bits encendidos (unos)</strong> equivale?`,
-        fields: [
-          { id: `${idPrefix}_ans`, label: 'Cantidad de Unos (0 a 8)', placeholder: 'Ej: 5', answer: String(item.ones), norm: v => v.replace(/\D/g, '') }
-        ]
+        title: 'Tabla de Máscara Sin Clase (Decimal → Cantidad de Unos)',
+        questionHtml: `El número <span class="highlight-warn">${item.dec}</span> en una máscara de subred, ¿a cuántos <strong>bits encendidos (unos)</strong> equivale?`,
+        fields: [{ id: `${idPrefix}_ans`, label: 'Cantidad de Unos (0 a 8)', placeholder: 'Ej: 6', answer: String(item.ones), norm: v => v.replace(/\D/g, '') }]
+      };
+    } else if (combo.v === 'decToStep') {
+      return {
+        type: 7, subType: 'decToStep', idPrefix, item,
+        title: 'Tabla de Máscara Sin Clase (Valor del Último Bit / Salto)',
+        questionHtml: `En el número de máscara <span class="highlight-warn">${item.dec}</span> (${item.ones} unos), ¿cuánto vale su <strong>último bit encendido</strong> (de cuánto en cuánto saltan las subredes)?`,
+        fields: [{ id: `${idPrefix}_ans`, label: 'Valor del Último Bit (Salto)', placeholder: 'Ej: 4, 8, 16, 32...', answer: String(item.step), norm: v => v.replace(/\D/g, '') }]
       };
     } else {
       return {
         type: 7, subType: 'decToBin', idPrefix, item,
-        title: 'Tabla de Máscara Sin Clase (Decimal a Binario)',
-        questionHtml: `Escribe los 8 bits en binario (unos y ceros) que representan al número <span class="highlight-warn">${item.dec}</span> en una máscara:`,
-        fields: [
-          { id: `${idPrefix}_ans`, label: 'Octeto en Binario (8 dígitos)', placeholder: 'Ej: 11111000', answer: item.bin, norm: v => v.replace(/\s+/g, '') }
-        ]
+        title: 'Tabla de Máscara Sin Clase (Decimal → Binario)',
+        questionHtml: `Escribe los 8 bits en binario (unos y ceros) que representan al valor <span class="highlight-warn">${item.dec}</span> de una máscara:`,
+        fields: [{ id: `${idPrefix}_ans`, label: 'Octeto en Binario (8 dígitos)', placeholder: 'Ej: 11111000', answer: item.bin, norm: v => v.replace(/\s+/g, '') }]
       };
     }
   }
 
-  // MODO 8 (NUEVO): ENTRENADOR DE CONVERSIÓN BINARIO <-> DECIMAL DE CUALQUIER NÚMERO (0 A 255) Y LÓGICA AND
+  // MODO 8: ENTRENADOR DE CONVERSIÓN BINARIO <-> DECIMAL Y LÓGICA AND (SIN EL TABLERO AZUL)
   if (type === 8) {
+    const scenario = forcedScenario || drawFromDeck('deck_mode8', [
+      'binToDec_easy', 'decToBin_easy', 'binToDec_med', 'decToBin_med',
+      'andLogic_med', 'binToDec_hard', 'decToBin_hard', 'andLogic_hard', 'multiples_method'
+    ]);
+
     let num;
-    if (diff === 0) {
-      // Fácil: 1 o 2 bits encendidos (ej. 2, 4, 8, 16, 18, 36, 65, 130)
+    if (scenario.endsWith('easy')) {
       const w1 = pick(WEIGHTS);
-      const w2 = Math.random() > 0.5 ? pick(WEIGHTS) : 0;
-      num = w1 === w2 ? w1 : w1 + w2;
-    } else if (diff === 1) {
-      // Medio: números comunes de octetos de IP (ej. 11, 25, 50, 74, 105, 155, 189, 200)
-      num = rand(11, 210);
+      const w2 = pick(WEIGHTS.filter(w => w !== w1));
+      num = Math.random() > 0.35 ? w1 + w2 : w1;
+    } else if (scenario.endsWith('med')) {
+      num = rand(13, 190);
     } else {
-      // Difícil: números altos con varios bits encendidos como en las preguntas de lógica AND del profe (ej. 189, 201, 205, 219)
       num = rand(145, 253);
     }
 
@@ -510,184 +429,245 @@ function createProblemData(type, idPrefix, diff = null) {
     const activeWeights = WEIGHTS.filter((_, i) => binStr[i] === '1');
     const sumBreakdown = activeWeights.length > 0 ? activeWeights.join(' + ') + ' = ' + num : '0';
 
-    const modeVariant = rand(1, 3);
-    if (modeVariant === 1) {
-      // Binario (ej. 01001010) -> ¿A cuánto equivale en decimal?
+    if (scenario.startsWith('binToDec')) {
       return {
         type: 8, subType: 'binToDec', idPrefix, num, binStr, sumBreakdown,
         title: 'Conversión de Binario a Decimal (8 bits)',
-        questionHtml: `Convierte el número binario de 8 bits <span class="highlight-warn">${binStr}</span> a su valor en <strong>decimal</strong> (suma los pesos <code>128, 64, 32, 16, 8, 4, 2, 1</code> donde hay un <code>1</code>):`,
-        fields: [
-          { id: `${idPrefix}_ans`, label: 'Valor en Decimal (0 a 255)', placeholder: 'Ej: 74', answer: String(num), norm: v => v.trim() }
-        ]
+        questionHtml: `Convierte el número binario de 8 bits <span class="highlight-warn">${binStr}</span> a su valor en <strong>decimal</strong> (recuerda el orden de pesos: <code>128, 64, 32, 16, 8, 4, 2, 1</code>):`,
+        fields: [{ id: `${idPrefix}_ans`, label: 'Valor en Decimal (0 a 255)', placeholder: 'Ej: 74', answer: String(num), norm: v => v.trim() }]
       };
-    } else if (modeVariant === 2) {
-      // Decimal (ej. 189) -> Escribe los 8 bits en binario (puedes usar el tablero de arriba haciendo clic en los botones)
+    } else if (scenario.startsWith('decToBin')) {
       return {
         type: 8, subType: 'decToBin', idPrefix, num, binStr, sumBreakdown,
-        title: 'Descomposición de Decimal a Binario (8 bits)',
-        questionHtml: `Descompón el número de IP <span class="highlight-warn">${num}</span> a <strong>binario de 8 bits</strong>.<br><small style="color:#94a3b8;">Tip: Puedes hacer clic en los cuadros del tablero azul de abajo para ir sumando hasta llegar a ${num} y se escribirá automáticamente:</small>`,
+        title: 'Conversión de Decimal a Binario (8 bits)',
+        questionHtml: `Descompón el número decimal <span class="highlight-warn">${num}</span> a su representación en <strong>binario de 8 bits</strong>:`,
+        fields: [{ id: `${idPrefix}_ans`, label: 'Binario de 8 bits (1s y 0s)', placeholder: 'Ej: 10111101', answer: binStr, norm: v => v.replace(/\s+/g, '') }]
+      };
+    } else if (scenario === 'multiples_method') {
+      const maskItem = pick(TABLE_DATA.slice(1, 8)); // 128 a 254 (saltos de 128, 64, 32, 16, 8, 4, 2)
+      const netVal = Math.floor(num / maskItem.step) * maskItem.step;
+      const nextVal = netVal + maskItem.step;
+      return {
+        type: 8, subType: 'multiples', idPrefix, num, binStr, sumBreakdown, maskDec: maskItem.dec, step: maskItem.step, netVal, nextVal,
+        title: 'Método Rápido de Múltiplos del Profesor (Red Base)',
+        questionHtml: `En un octeto tienes el valor de IP <span class="highlight">${num}</span> y la máscara en ese octeto es <span class="highlight-warn">${maskItem.dec}</span>.<br>Usando el método de múltiplos del profesor: ¿de cuánto en cuánto va el salto (último bit encendido) y cuál es el múltiplo que corresponde a la <strong>Red Base</strong>?`,
         fields: [
-          { id: `${idPrefix}_ans`, label: 'Binario de 8 bits (1s y 0s)', placeholder: 'Ej: 10111101', answer: binStr, norm: v => v.replace(/\s+/g, '') }
+          { id: `${idPrefix}_step`, label: 'Salto de Red (Último bit de ' + maskItem.dec + ')', placeholder: 'Ej: 4, 8, 16, 32...', answer: String(maskItem.step), norm: v => v.replace(/\D/g, '') },
+          { id: `${idPrefix}_ans`, label: 'Valor resultante para la Red Base', placeholder: 'Múltiplo <= ' + num, answer: String(netVal), norm: v => v.replace(/\D/g, '') }
         ]
       };
     } else {
-      // Lógica AND directa entre un octeto de IP y un octeto de máscara sin clase
-      const maskItem = pick(TABLE_DATA.slice(1, 8)); // 128 a 254
+      const maskItem = pick(TABLE_DATA.slice(1, 8));
       const andResult = num & maskItem.dec;
       const andBin = decToBin8(andResult);
       return {
         type: 8, subType: 'andLogic', idPrefix, num, binStr, sumBreakdown, maskDec: maskItem.dec, maskBin: maskItem.bin, andResult, andBin,
         title: 'Lógica AND entre Octeto de IP y Máscara',
-        questionHtml: `Si haces <strong>Lógica AND</strong> entre el octeto de IP <span class="highlight">${num}</span> (<code>${binStr}</code>) y el octeto de máscara <span class="highlight">${maskItem.dec}</span> (<code>${maskItem.bin}</code>), ¿qué número decimal resulta para la Red Base?`,
+        questionHtml: `Aplica <strong>Lógica AND</strong> entre el octeto de IP <span class="highlight">${num}</span> y el octeto de máscara <span class="highlight-warn">${maskItem.dec}</span>.<br>Escribe el binario de la IP, el binario de la máscara y el resultado final en decimal:`,
         fields: [
-          { id: `${idPrefix}_ans`, label: 'Resultado Decimal del AND', placeholder: 'Ej: 188', answer: String(andResult), norm: v => v.trim() }
+          { id: `${idPrefix}_ipbin`, label: '1. IP ' + num + ' en Binario (8 bits)', placeholder: 'Ej: 10111101', answer: binStr, norm: v => v.replace(/\s+/g, '') },
+          { id: `${idPrefix}_mbin`, label: '2. Máscara ' + maskItem.dec + ' en Binario', placeholder: 'Ej: 11111100', answer: maskItem.bin, norm: v => v.replace(/\s+/g, '') },
+          { id: `${idPrefix}_ans`, label: '3. Resultado AND en Decimal', placeholder: 'Ej: 188', answer: String(andResult), norm: v => v.trim() }
         ]
       };
     }
   }
 
-  // MODO 1: CLASES, PORCIONES DE RED/HOST E IPs PRIVADAS vs PÚBLICAS (CON TRAMPA DE MÁSCARA QUE MANDA)
+  // MODO 1: CLASES (A-E), PORCIONES DE RED/HOST E IPs PRIVADAS vs PÚBLICAS (8 ESCENARIOS EN BARAJA)
   if (type === 1) {
-    // En dificultad difícil (diff===2), 50% de probabilidad de que venga con una máscara explícita que altera la porción de red/host (ej. IP 15.200.100.50 con máscara 255.255.255.0)
-    const hasCustomMaskTrap = (diff === 2 && Math.random() > 0.4);
-    const classes = ['A', 'B', 'C'];
-    const chosen = pick(classes);
+    const scenario = forcedScenario || drawFromDeck('deck_mode1', [
+      'priv_A', 'pub_A_border', 'priv_B', 'pub_B_trap',
+      'priv_C', 'pub_C_trap', 'custom_mask_overrides', 'class_D_or_E'
+    ]);
 
-    let o1, o2 = rand(0, 250), o3 = rand(1, 250), o4 = rand(1, 250);
+    let chosen, o1, o2 = rand(0, 250), o3 = rand(1, 250), o4 = rand(1, 250);
 
-    // Generar a propósito IPs Privadas o Públicas "trampa" (como 172.30.x.x, 172.32.x.x, 192.168.x.x, 192.167.x.x, 10.x.x.x)
-    const forcePrivateOrTrap = Math.random() > 0.3;
-    if (forcePrivateOrTrap) {
-      if (chosen === 'A') {
-        o1 = Math.random() > 0.5 ? 10 : pick([1, 11, 15, 125, 126, 127]);
-      } else if (chosen === 'B') {
-        const subCase = rand(1, 3);
-        if (subCase === 1) { o1 = 172; o2 = rand(16, 31); } // Privada Clase B
-        else if (subCase === 2) { o1 = 172; o2 = pick([14, 15, 32, 33, 50]); } // Trampa Pública con 172
-        else { o1 = pick([128, 129, 144, 166, 185, 191]); }
-      } else {
-        const subCase = rand(1, 3);
-        if (subCase === 1) { o1 = 192; o2 = 168; } // Privada Clase C
-        else if (subCase === 2) { o1 = 192; o2 = pick([167, 169, 160, 100]); } // Trampa Pública con 192.167
-        else { o1 = pick([198, 200, 201, 222, 223]); }
-      }
-    } else {
-      o1 = chosen === 'A' ? rand(2, 126) : (chosen === 'B' ? rand(128, 191) : rand(192, 223));
+    if (scenario === 'class_D_or_E') {
+      chosen = Math.random() > 0.5 ? 'D' : 'E';
+      o1 = chosen === 'D' ? rand(224, 239) : rand(240, 255);
+      const ip = `${o1}.${o2}.${o3}.${o4}`;
+      const uso = chosen === 'D' ? 'MULTICAST' : 'PRUEBAS';
+      return {
+        type: 1, subMode: 'classDE', idPrefix, ip, chosen, o1, uso,
+        title: 'Identificación de Clases Especiales (Clase D y Clase E)',
+        questionHtml: `Un estudiante intenta configurar la IP <span class="highlight-warn">${ip}</span> en una PC en Packet Tracer y le sale error de dirección inválida.<br>¿A qué <strong>Clase (A, B, C, D o E)</strong> pertenece esta IP y para qué uso está reservada (escribe <strong>Multicast</strong> o <strong>Pruebas / NASA</strong>)?`,
+        fields: [
+          { id: `${idPrefix}_class`, label: 'Clase de la IP (A, B, C, D o E)', placeholder: 'Ej: D o E', answer: chosen, norm: v => v.trim().toUpperCase() },
+          { id: `${idPrefix}_uso`, label: 'Uso Reservado (Multicast / Pruebas)', placeholder: 'Multicast o Pruebas', answer: uso, norm: v => {
+            const s = v.trim().toUpperCase();
+            if (s.includes('MULT')) return 'MULTICAST';
+            if (s.includes('PRUEB') || s.includes('NASA') || s.includes('INV')) return 'PRUEBAS';
+            return s;
+          }}
+        ]
+      };
+    }
+
+    if (scenario === 'priv_A') { chosen = 'A'; o1 = 10; }
+    else if (scenario === 'pub_A_border') { chosen = 'A'; o1 = pick([1, 9, 11, 15, 85, 125, 126, 127]); }
+    else if (scenario === 'priv_B') { chosen = 'B'; o1 = 172; o2 = rand(16, 31); }
+    else if (scenario === 'pub_B_trap') { chosen = 'B'; o1 = Math.random() > 0.35 ? 172 : pick([128, 129, 144, 166, 185, 191]); if (o1 === 172) o2 = pick([12, 15, 32, 35, 100]); }
+    else if (scenario === 'priv_C') { chosen = 'C'; o1 = 192; o2 = 168; }
+    else if (scenario === 'pub_C_trap') { chosen = 'C'; o1 = Math.random() > 0.35 ? 192 : pick([193, 198, 200, 201, 222, 223]); if (o1 === 192) o2 = pick([167, 169, 160, 10]); }
+    else {
+      // custom_mask_overrides: Ej. IP 15.200.100.50 con máscara 255.255.255.0
+      chosen = pick(['A', 'B', 'C']);
+      o1 = chosen === 'A' ? pick([10, 15, 45, 90, 120]) : (chosen === 'B' ? pick([130, 166, 172, 188]) : pick([192, 200, 210]));
+      if (o1 === 172) o2 = pick([15, 20, 32]);
+      if (o1 === 192) o2 = pick([167, 168]);
     }
 
     const ip = `${o1}.${o2}.${o3}.${o4}`;
     const isPriv = isPrivateIPv4(o1, o2);
     const privPubAns = isPriv ? 'PRIVADO' : 'PUBLICO';
 
-    if (hasCustomMaskTrap) {
-      // Ejemplo del profe: IP 15.200.100.50 (Clase A) pero con máscara 255.255.255.0 -> Manda la máscara
-      const maskClass = chosen === 'A' ? pick(['B', 'C']) : (chosen === 'B' ? 'C' : 'B');
-      const givenMask = maskClass === 'B' ? '255.255.0.0' : '255.255.255.0';
-      const netPortion = maskClass === 'B' ? `${o1}.${o2}` : `${o1}.${o2}.${o3}`;
-      const hostPortion = maskClass === 'B' ? `${o3}.${o4}` : `${o4}`;
+    if (scenario === 'custom_mask_overrides') {
+      const maskClass = chosen === 'A' ? pick(['B', 'C']) : (chosen === 'B' ? pick(['A', 'C']) : pick(['A', 'B']));
+      const givenMask = maskClass === 'A' ? '255.0.0.0' : (maskClass === 'B' ? '255.255.0.0' : '255.255.255.0');
+      const netPortion = maskClass === 'A' ? `${o1}` : (maskClass === 'B' ? `${o1}.${o2}` : `${o1}.${o2}.${o3}`);
+      const hostPortion = maskClass === 'A' ? `${o2}.${o3}.${o4}` : (maskClass === 'B' ? `${o3}.${o4}` : `${o4}`);
 
       return {
         type: 1, subMode: 'customMaskTrap', idPrefix, ip, chosen, givenMask, maskClass, netPortion, hostPortion, o1, o2, isPriv, privPubAns,
         title: '🔥 Clase, Porción de Red/Host (Con Máscara Explícita) y Privado/Público',
-        questionHtml: `Se tiene el IP <span class="highlight">${ip}</span> acompañado de la máscara <span class="highlight-warn">${givenMask}</span>.<br>Recuerda quién manda para las porciones cuando te dan la máscara. Determina la Clase de la IP, la Porción de Red, la Porción de Host y si la IP es <strong>Privado o Público</strong>:`,
+        questionHtml: `Se tiene el IP <span class="highlight">${ip}</span> configurado con la máscara explícita <span class="highlight-warn">${givenMask}</span>.<br>Recuerda quién manda cuando te dan la máscara. Determina la Clase original del IP, la Porción de Red, la Porción de Host y si el IP es <strong>Privado o Público</strong>:`,
         fields: [
-          { id: `${idPrefix}_class`, label: 'Clase de la IP (A, B o C)', placeholder: 'Ej: A', answer: chosen, norm: v => v.trim().toUpperCase() },
+          { id: `${idPrefix}_class`, label: 'Clase del IP (A, B o C)', placeholder: 'Ej: A', answer: chosen, norm: v => v.trim().toUpperCase() },
           { id: `${idPrefix}_net`, label: 'Porción de Red (según máscara)', placeholder: 'Ej: 15.200.100', answer: netPortion, norm: v => v.trim() },
           { id: `${idPrefix}_host`, label: 'Porción de Host (según máscara)', placeholder: 'Ej: 50', answer: hostPortion, norm: v => v.trim() },
-          { id: `${idPrefix}_priv`, label: 'Tipo de IP (Privado o Público)', placeholder: 'Privado / Público', answer: privPubAns, norm: normPrivPub }
-        ]
-      };
-    } else {
-      const defMask = chosen === 'A' ? '255.0.0.0' : (chosen === 'B' ? '255.255.0.0' : '255.255.255.0');
-      const netPortion = chosen === 'A' ? `${o1}` : (chosen === 'B' ? `${o1}.${o2}` : `${o1}.${o2}.${o3}`);
-      const hostPortion = chosen === 'A' ? `${o2}.${o3}.${o4}` : (chosen === 'B' ? `${o3}.${o4}` : `${o4}`);
-
-      return {
-        type: 1, subMode: 'standard', idPrefix, ip, chosen, netPortion, hostPortion, defMask, o1, o2, isPriv, privPubAns,
-        title: 'Clases, Porciones de Red/Host e IP Privada/Pública',
-        questionHtml: `Dada la dirección IP: <span class="highlight">${ip}</span><br>Calcula su clase, máscara por defecto, porción de red, porción de host y si es un IP <strong>Privado o Público</strong>:`,
-        fields: [
-          { id: `${idPrefix}_class`, label: 'Clase (A, B o C)', placeholder: 'Ej: B', answer: chosen, norm: v => v.trim().toUpperCase() },
-          { id: `${idPrefix}_mask`, label: 'Máscara por defecto', placeholder: 'Ej: 255.255.0.0', answer: defMask, norm: v => v.trim() },
-          { id: `${idPrefix}_net`, label: 'Porción de Red', placeholder: 'Ej: 166.21', answer: netPortion, norm: v => v.trim() },
-          { id: `${idPrefix}_host`, label: 'Porción de Host', placeholder: 'Ej: 89.78', answer: hostPortion, norm: v => v.trim() },
           { id: `${idPrefix}_priv`, label: '¿Privado o Público?', placeholder: 'Privado / Público', answer: privPubAns, norm: normPrivPub }
         ]
       };
     }
-  } 
 
-  // MODO 2: PREFIJOS Y MÁSCARAS
-  if (type === 2) {
-    let prefix = diff === 0
-      ? pick([8, 16, 24, 25, 26, 28, 30])
-      : (diff === 1 ? pick([17, 18, 19, 20, 21, 22, 23, 27, 29]) : pick([5, 6, 7, 9, 10, 11, 12, 13, 14, 15]));
-    const mask = prefixToMask(prefix);
-    const askDecimal = Math.random() > 0.35;
-    const octets = mask.split('.').map(Number);
-    let activeOctetIdx = Math.floor((prefix - 1) / 8);
-    let bitsInActive = prefix - (activeOctetIdx * 8);
+    const defMask = chosen === 'A' ? '255.0.0.0' : (chosen === 'B' ? '255.255.0.0' : '255.255.255.0');
+    const netPortion = chosen === 'A' ? `${o1}` : (chosen === 'B' ? `${o1}.${o2}` : `${o1}.${o2}.${o3}`);
+    const hostPortion = chosen === 'A' ? `${o2}.${o3}.${o4}` : (chosen === 'B' ? `${o3}.${o4}` : `${o4}`);
 
     return {
-      type: 2, idPrefix, prefix, mask, askDecimal, activeOctetIdx, bitsInActive, octVal: octets[activeOctetIdx],
-      title: 'Conversión de Prefijo y Máscara',
-      questionHtml: askDecimal
-        ? `Convierte el prefijo de máscara <span class="highlight">/${prefix}</span> a su formato decimal:`
-        : `Convierte la máscara <span class="highlight">${mask}</span> a notación de longitud de prefijo (/X):`,
-      fields: askDecimal
-        ? [{ id: `${idPrefix}_val`, label: 'Máscara en Decimal', placeholder: 'Ej: 255.255.248.0', answer: mask, norm: v => v.trim() }]
-        : [{ id: `${idPrefix}_val`, label: 'Longitud de Prefijo (/X)', placeholder: 'Ej: /21 o 21', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') }]
+      type: 1, subMode: 'standard', idPrefix, ip, chosen, netPortion, hostPortion, defMask, o1, o2, isPriv, privPubAns,
+      title: 'Clases, Porciones de Red/Host e IP Privada/Pública',
+      questionHtml: `Dada la dirección IP: <span class="highlight">${ip}</span><br>Calcula su clase, máscara por defecto, porción de red, porción de host y si es un IP <strong>Privado o Público</strong>:`,
+      fields: [
+        { id: `${idPrefix}_class`, label: 'Clase (A, B o C)', placeholder: 'Ej: B', answer: chosen, norm: v => v.trim().toUpperCase() },
+        { id: `${idPrefix}_mask`, label: 'Máscara por defecto', placeholder: 'Ej: 255.255.0.0', answer: defMask, norm: v => v.trim() },
+        { id: `${idPrefix}_net`, label: 'Porción de Red', placeholder: 'Ej: 166.21', answer: netPortion, norm: v => v.trim() },
+        { id: `${idPrefix}_host`, label: 'Porción de Host', placeholder: 'Ej: 89.78', answer: hostPortion, norm: v => v.trim() },
+        { id: `${idPrefix}_priv`, label: '¿Privado o Público?', placeholder: 'Privado / Público', answer: privPubAns, norm: normPrivPub }
+      ]
     };
   } 
 
-  // MODO 3: CANTIDAD DE HOSTS Y BITS PRESTADOS (2^N - 2)
+  // MODO 2: PREFIJOS Y MÁSCARAS (BARAJANDO TODOS LOS PREFIJOS DE /2 A /30 Y FORMATOS VARIADOS)
+  if (type === 2) {
+    const allPrefs = [];
+    for (let p = 2; p <= 30; p++) allPrefs.push(p);
+    const prefix = drawFromDeck('deck_mode2_pref', allPrefs);
+    const variant = forcedScenario || drawFromDeck('deck_mode2_var', ['prefToDec', 'decToPref', 'prefToDecAndStep', 'decToPrefAndZeros']);
+
+    const mask = prefixToMask(prefix);
+    const octets = mask.split('.').map(Number);
+    let activeOctetIdx = Math.floor((prefix - 1) / 8);
+    let bitsInActive = prefix - (activeOctetIdx * 8);
+    let step = Math.pow(2, 8 - bitsInActive);
+    let zeros = 32 - prefix;
+
+    if (variant === 'prefToDec') {
+      return {
+        type: 2, subMode: variant, idPrefix, prefix, mask, activeOctetIdx, bitsInActive, octVal: octets[activeOctetIdx], step, zeros,
+        title: 'Conversión de Prefijo a Máscara Decimal',
+        questionHtml: `Convierte el prefijo de máscara <span class="highlight">/${prefix}</span> a su formato decimal (X.X.X.X):`,
+        fields: [{ id: `${idPrefix}_val`, label: 'Máscara en Decimal', placeholder: 'Ej: 255.255.248.0', answer: mask, norm: v => v.trim() }]
+      };
+    } else if (variant === 'decToPref') {
+      return {
+        type: 2, subMode: variant, idPrefix, prefix, mask, activeOctetIdx, bitsInActive, octVal: octets[activeOctetIdx], step, zeros,
+        title: 'Conversión de Máscara Decimal a Prefijo',
+        questionHtml: `Convierte la máscara <span class="highlight">${mask}</span> a notación de longitud de prefijo (/X):`,
+        fields: [{ id: `${idPrefix}_val`, label: 'Longitud de Prefijo (/X)', placeholder: 'Ej: /21 o 21', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') }]
+      };
+    } else if (variant === 'prefToDecAndStep') {
+      return {
+        type: 2, subMode: variant, idPrefix, prefix, mask, activeOctetIdx, bitsInActive, octVal: octets[activeOctetIdx], step, zeros,
+        title: 'Prefijo a Máscara Decimal y Salto de Red',
+        questionHtml: `Dado el prefijo <span class="highlight">/${prefix}</span>, escribe su <strong>máscara en formato decimal</strong> y cuánto vale el <strong>último bit encendido (salto de red)</strong> en el octeto #${activeOctetIdx + 1}:`,
+        fields: [
+          { id: `${idPrefix}_val`, label: 'Máscara en Decimal', placeholder: 'Ej: 255.255.224.0', answer: mask, norm: v => v.trim() },
+          { id: `${idPrefix}_step`, label: 'Valor del Último Bit (Salto)', placeholder: 'Ej: 32', answer: String(step), norm: v => v.replace(/\D/g, '') }
+        ]
+      };
+    } else {
+      return {
+        type: 2, subMode: variant, idPrefix, prefix, mask, activeOctetIdx, bitsInActive, octVal: octets[activeOctetIdx], step, zeros,
+        title: 'Análisis de Bits Encendidos (1s) y Sobrantes (0s)',
+        questionHtml: `Dada la máscara de subred <span class="highlight">${mask}</span>, determina su <strong>prefijo (/X)</strong> y cuántos <strong>ceros sobrantes (N)</strong> quedan en total de los 32 bits:`,
+        fields: [
+          { id: `${idPrefix}_val`, label: 'Longitud de Prefijo (/X)', placeholder: 'Ej: /19 o 19', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
+          { id: `${idPrefix}_zeros`, label: 'Ceros Sobrantes (N = 32 - Prefijo)', placeholder: 'Ej: 13', answer: String(zeros), norm: v => v.replace(/\D/g, '') }
+        ]
+      };
+    }
+  } 
+
+  // MODO 3: CANTIDAD DE HOSTS Y BITS PRESTADOS (2^N - 2) SIN REPETIR POTENCIAS
   if (type === 3) {
-    const subType = Math.random() > 0.45 ? 'hostsToMask' : 'maskToHosts';
-    let nBits = diff === 0 ? pick([2, 3, 4, 5, 6, 7, 8]) : (diff === 1 ? pick([9, 10, 11, 12, 13, 14]) : pick([15, 16, 17, 18, 20, 21]));
+    const allPowers = [];
+    for (let n = 2; n <= 24; n++) allPowers.push(n);
+    const nBits = drawFromDeck('deck_mode3_n', allPowers);
+    const subType = forcedScenario || drawFromDeck('deck_mode3_var', ['maskToHosts_dec', 'maskToHosts_pref', 'hostsToMask', 'hostsToMask_exactCap']);
+
     const prefix = 32 - nBits;
     const mask = prefixToMask(prefix);
     const totalHosts = Math.pow(2, nBits) - 2;
 
-    if (subType === 'maskToHosts') {
-      const showAsPrefix = Math.random() > 0.5;
+    if (subType.startsWith('maskToHosts')) {
+      const showAsPrefix = (subType === 'maskToHosts_pref');
       return {
-        type: 3, subType, idPrefix, prefix, mask, zeros: nBits, totalHosts,
+        type: 3, subType: 'maskToHosts', idPrefix, prefix, mask, zeros: nBits, totalHosts,
         title: 'Cálculo de Cantidad de Hosts (2^N - 2)',
-        questionHtml: `¿Para cuántos <strong>hosts (IPs válidas)</strong> alcanza la máscara <span class="highlight">${showAsPrefix ? '/' + prefix : mask}</span>? (Escribe solo el número entero):`,
+        questionHtml: `¿Para cuántos <strong>hosts (IPs válidas)</strong> alcanza la máscara <span class="highlight">${showAsPrefix ? '/' + prefix : mask}</span>? (Fórmula: <code>2^N - 2</code>):`,
         fields: [
-          { id: `${idPrefix}_hosts`, label: 'Cantidad de Hosts válidos (2^N - 2)', placeholder: 'Ej: 8190', answer: String(totalHosts), norm: v => v.replace(/\D/g, '') }
+          { id: `${idPrefix}_hosts`, label: 'Cantidad de Hosts válidos', placeholder: 'Escribe el número entero', answer: String(totalHosts), norm: v => v.replace(/\D/g, '') }
         ]
       };
     } else {
       const minCap = Math.pow(2, nBits - 1) - 1;
-      let reqPCs = diff === 2 && Math.random() > 0.5 ? totalHosts : rand(Math.max(2, minCap + 1), totalHosts);
+      const reqPCs = (subType === 'hostsToMask_exactCap' || nBits === 2)
+        ? totalHosts
+        : rand(Math.max(2, minCap + 1), totalHosts - 1);
+
       return {
-        type: 3, subType, idPrefix, nBits, maxCap: totalHosts, reqPCs, prefix, mask,
-        title: 'Diseño de Máscara según Hosts (Bits prestados)',
-        questionHtml: `Se necesita diseñar una subred para cubrir <span class="highlight">${reqPCs.toLocaleString('es-PE')} PCs (hosts)</span>.<br>Calcula el prefijo y la máscara en formato decimal:`,
+        type: 3, subType: 'hostsToMask', idPrefix, nBits, maxCap: totalHosts, reqPCs, prefix, mask,
+        title: 'Diseño de Máscara según Hosts Requeridos',
+        questionHtml: `Un área de la empresa requiere conectar <span class="highlight">${reqPCs.toLocaleString('es-PE')} equipos (hosts)</span>.<br>Calcula el prefijo óptimo, la máscara en decimal y la capacidad máxima real (<code>2^N - 2</code>) que tendrá esa subred:`,
         fields: [
-          { id: `${idPrefix}_pref`, label: 'Prefijo (/X)', placeholder: 'Ej: /26 o 26', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
-          { id: `${idPrefix}_mask`, label: 'Máscara en Decimal', placeholder: 'Ej: 255.255.255.192', answer: mask, norm: v => v.trim() }
+          { id: `${idPrefix}_pref`, label: '1. Prefijo (/X)', placeholder: 'Ej: /26 o 26', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
+          { id: `${idPrefix}_mask`, label: '2. Máscara en Decimal', placeholder: 'Ej: 255.255.255.192', answer: mask, norm: v => v.trim() },
+          { id: `${idPrefix}_cap`, label: '3. Hosts máximos que soporta (2^N-2)', placeholder: 'Ej: 62', answer: String(totalHosts), norm: v => v.replace(/\D/g, '') }
         ]
       };
     }
   } 
 
-  // MODO 4: RED BASE, 1ER IP, ÚLTIMO IP, BROADCAST Y SIGUIENTE RED
+  // MODO 4: RED BASE, 1ER IP, ÚLTIMO IP, BROADCAST Y SIGUIENTE RED (ROTANDO OCTETOS 2, 3 Y 4)
   if (type === 4) {
-    let prefix, usePCsPrompt;
-    if (diff === 0) {
-      prefix = pick([25, 26, 27, 28, 29, 30]);
-      usePCsPrompt = false;
-    } else if (diff === 1) {
-      prefix = pick([18, 19, 20, 21, 22, 23, 26, 27, 28, 29]);
-      usePCsPrompt = prefix >= 26 ? true : (Math.random() > 0.5);
-    } else {
-      prefix = pick([10, 11, 12, 13, 14, 17, 19, 21, 22, 23]);
-      usePCsPrompt = true;
+    const scenario = forcedScenario || drawFromDeck('deck_mode4', [
+      'oct4_mask', 'oct4_pref', 'oct4_pcs',
+      'oct3_mask', 'oct3_pref', 'oct3_pcs',
+      'oct2_pref', 'oct2_pcs', 'gateway_trap'
+    ]);
+
+    if (scenario === 'gateway_trap') {
+      return createProblemData(11, idPrefix);
     }
 
+    let prefix;
+    if (scenario.startsWith('oct4')) prefix = drawFromDeck('deck_m4_o4', [25, 26, 27, 28, 29, 30]);
+    else if (scenario.startsWith('oct3')) prefix = drawFromDeck('deck_m4_o3', [17, 18, 19, 20, 21, 22, 23]);
+    else prefix = drawFromDeck('deck_m4_o2', [9, 10, 11, 12, 13, 14, 15]);
+
+    const usePCsPrompt = scenario.endsWith('pcs');
+    const showAsMask = scenario.endsWith('mask');
     const nBits = 32 - prefix;
     const mask = prefixToMask(prefix);
 
@@ -724,11 +704,11 @@ function createProblemData(type, idPrefix, diff = null) {
 
     let reqPCs = rand(Math.pow(2, nBits - 1) + 1, Math.pow(2, nBits) - 2);
     let datoExtra = usePCsPrompt 
-      ? `para <span class="highlight">${reqPCs.toLocaleString('es-PE')} PCs</span> (calcula primero la máscara)`
-      : `con máscara <span class="highlight">${Math.random() > 0.5 ? '/' + prefix : mask}</span>`;
+      ? `para cubrir <span class="highlight-warn">${reqPCs.toLocaleString('es-PE')} PCs</span> (halla primero la máscara)`
+      : `con máscara <span class="highlight">${showAsMask ? mask : '/' + prefix}</span>`;
 
     let fields = [];
-    if (usePCsPrompt && diff === 2) {
+    if (usePCsPrompt) {
       fields.push({ id: `${idPrefix}_mask`, label: '0. Máscara Calculada (Decimal)', placeholder: 'Ej: 255.255.252.0', answer: mask, norm: v => v.trim() });
     }
     fields.push(
@@ -743,17 +723,34 @@ function createProblemData(type, idPrefix, diff = null) {
       type: 4, idPrefix, ip: ipArr.join('.'), prefix, mask, varIdx, step, reqPCs, usePCsPrompt, nBits,
       net: netArr.join('.'), firstIp: firstIpArr.join('.'), lastIp: lastIpArr.join('.'),
       bcast: bcastArr.join('.'), nextNet: nextNetArr.join('.'),
-      title: 'Cálculo Completo de Red, Rangos y Broadcast',
-      questionHtml: `Se tiene el IP <span class="highlight">${ipArr.join('.')}</span> ${datoExtra}.<br>Calcula todos los datos solicitados:`,
+      title: `Cálculo Completo de Red y Broadcast (Variando en Octeto #${varIdx + 1})`,
+      questionHtml: `Se tiene la dirección IP <span class="highlight">${ipArr.join('.')}</span> ${datoExtra}.<br>Calcula todos los parámetros de la subred:`,
       fields
     };
   }
 
-  // MODO 5: CÁLCULO DEL NÚMERO DE SUBREDES (2^M) CON LOS 4 CASOS DEL PROFESOR
+  // MODO 5: CÁLCULO DEL NÚMERO DE SUBREDES (2^M) ROTANDO LOS 5 ESCENARIOS DEL PROFESOR
   if (type === 5) {
-    if (diff === 0) {
-      // Caso 1: Solo máscara o prefijo (sin IP) -> incluye máscaras con clase (/8, /16, /24 que dan 2^0 = 1 subred) y sin clase
-      const prefix = pick([8, 12, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]);
+    const scenario = forcedScenario || drawFromDeck('deck_mode5', [
+      'maskOnly_classless', 'maskOnly_classful', 'pcsToSubnets',
+      'ipAndMask_ClassA', 'ipAndMask_ClassB', 'ipAndPCs_ClassA', 'ipAndPCs_ClassB'
+    ]);
+
+    if (scenario === 'maskOnly_classful') {
+      const prefix = drawFromDeck('deck_m5_cf', [8, 16, 24]);
+      const mask = prefixToMask(prefix);
+      return {
+        type: 5, subMode: 'maskOnly', idPrefix, prefix, mask, mBits: 0, subnets: 1,
+        title: 'Cálculo de Subredes en Máscara Con Clase',
+        questionHtml: `Dada la máscara con clase <span class="highlight">${Math.random() > 0.4 ? mask : '/' + prefix}</span> (sin ninguna IP adicional), ¿cuántos bits prestados (M) tiene y para cuántas <strong>subredes (2^M)</strong> alcanza?`,
+        fields: [
+          { id: `${idPrefix}_sub`, label: 'Cantidad de Subredes (2^M)', placeholder: 'Escribe el número entero', answer: '1', norm: v => v.replace(/\D/g, '') }
+        ]
+      };
+    }
+
+    if (scenario === 'maskOnly_classless') {
+      const prefix = drawFromDeck('deck_m5_cl', [9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 30]);
       const mask = prefixToMask(prefix);
       const mBits = prefix % 8;
       const subnets = Math.pow(2, mBits);
@@ -762,14 +759,15 @@ function createProblemData(type, idPrefix, diff = null) {
       return {
         type: 5, subMode: 'maskOnly', idPrefix, prefix, mask, mBits, subnets,
         title: 'Cálculo de Número de Subredes (2^M)',
-        questionHtml: `Dada únicamente la máscara <span class="highlight">${showPrefix ? '/' + prefix : mask}</span>, ¿cuántas <strong>subredes</strong> se pueden obtener? (Usa <code>2^M</code> donde M son los unos prestados):`,
+        questionHtml: `Dada únicamente la máscara sin clase <span class="highlight">${showPrefix ? '/' + prefix : mask}</span>, ¿cuántas <strong>subredes</strong> se pueden obtener? (Usa <code>2^M</code> donde M son los unos sobrantes en ese octeto):`,
         fields: [
-          { id: `${idPrefix}_sub`, label: 'Cantidad de Subredes (2^M)', placeholder: 'Ej: 16 o 1', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
+          { id: `${idPrefix}_sub`, label: 'Cantidad de Subredes (2^M)', placeholder: 'Ej: 16, 64, 128...', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
         ]
       };
-    } else if (diff === 1) {
-      // Caso 2: Cantidad de PCs (sin IP) -> Subredes
-      const nBits = pick([3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15]);
+    }
+
+    if (scenario === 'pcsToSubnets') {
+      const nBits = drawFromDeck('deck_m5_pcs', [3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 17, 18]);
       const prefix = 32 - nBits;
       const mask = prefixToMask(prefix);
       const mBits = prefix % 8;
@@ -781,141 +779,154 @@ function createProblemData(type, idPrefix, diff = null) {
       return {
         type: 5, subMode: 'pcsToSubnets', idPrefix, reqPCs, nBits, prefix, mask, mBits, subnets,
         title: 'Cálculo de Subredes a partir de Cantidad de PCs',
-        questionHtml: `Si tengo <span class="highlight">${reqPCs.toLocaleString('es-PE')} PCs (IPs)</span> (sin una IP base específica), ¿cuál es el prefijo de máscara y cuántas <strong>subredes (2^M)</strong> podré tener en ese octeto?`,
+        questionHtml: `Si necesito cubrir <span class="highlight">${reqPCs.toLocaleString('es-PE')} PCs (IPs)</span> (sin una IP base específica), ¿cuál es el prefijo de máscara y cuántas <strong>subredes (2^M)</strong> podré tener en ese octeto?`,
         fields: [
           { id: `${idPrefix}_pref`, label: 'Prefijo Calculado (/X)', placeholder: 'Ej: /22 o 22', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
           { id: `${idPrefix}_sub`, label: 'Cantidad de Subredes (2^M)', placeholder: 'Ej: 64', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
         ]
       };
+    }
+
+    // Escenarios con IP + Máscara o IP + Cantidad de PCs (La Clase de la IP Manda)
+    const chosenClass = scenario.endsWith('ClassA') ? 'A' : 'B';
+    const basePrefix = chosenClass === 'A' ? 8 : 16;
+    const baseMask = chosenClass === 'A' ? '255.0.0.0' : '255.255.0.0';
+    const o1 = chosenClass === 'A' ? drawFromDeck('deck_o1_A', [10, 15, 25, 45, 80, 100, 125]) : drawFromDeck('deck_o1_B', [129, 140, 155, 172, 185, 190]);
+    const ip = `${o1}.${rand(1, 201)}.${rand(1, 100)}.${rand(1, 250)}`;
+
+    if (scenario.startsWith('ipAndMask')) {
+      const prefix = chosenClass === 'A'
+        ? drawFromDeck('deck_m5_ipmA', [16, 17, 18, 19, 20, 21, 22, 24, 26, 28])
+        : drawFromDeck('deck_m5_ipmB', [24, 25, 26, 27, 28, 29, 30]);
+      const mask = prefixToMask(prefix);
+      const mBits = prefix - basePrefix;
+      const subnets = Math.pow(2, mBits);
+
+      return {
+        type: 5, subMode: 'ipAndMaskTrap', idPrefix, ip, chosenClass, basePrefix, baseMask, prefix, mask, mBits, subnets,
+        title: '🔥 Cálculo de Subredes con IP y Máscara (La Clase Manda)',
+        questionHtml: `Se tiene la dirección IP <span class="highlight">${ip}</span> con la máscara <span class="highlight">${Math.random() > 0.25 ? mask : '/' + prefix}</span>.<br>Como te dan la IP, <strong>su Clase manda</strong>. ¿Cuántos bits prestados (M) hay en total desde su máscara original y cuántas <strong>subredes</strong> se obtienen?`,
+        fields: [
+          { id: `${idPrefix}_mbits`, label: 'Bits Prestados Totales (M)', placeholder: 'Ej: 8, 12, 13, 20', answer: String(mBits), norm: v => v.replace(/\D/g, '') },
+          { id: `${idPrefix}_sub`, label: 'Cantidad de Subredes (2^M)', placeholder: 'Ej: 256 o 4096', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
+        ]
+      };
     } else {
-      // En nivel difícil alternamos entre: Caso 3 (IP + Máscara) y Caso 4 (IP + Cantidad de IPs, como 125.10.5.98 para 6000 IPs o 185.201.1.98 para 20000 IPs)
-      const useIPAndPCs = Math.random() > 0.45;
-      const chosenClass = pick(['A', 'B']);
-      const basePrefix = chosenClass === 'A' ? 8 : 16;
-      const baseMask = chosenClass === 'A' ? '255.0.0.0' : '255.255.0.0';
-      const o1 = chosenClass === 'A' ? pick([10, 15, 45, 80, 125]) : pick([129, 150, 172, 185, 190]);
-      const ip = `${o1}.${rand(1, 201)}.${rand(1, 100)}.${rand(1, 250)}`;
+      const nBits = chosenClass === 'A'
+        ? drawFromDeck('deck_m5_ippA', [10, 11, 12, 13, 14, 15, 16])
+        : drawFromDeck('deck_m5_ippB', [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+      const prefix = 32 - nBits;
+      const mask = prefixToMask(prefix);
+      const mBits = prefix - basePrefix;
+      const subnets = Math.pow(2, mBits);
+      const maxHosts = Math.pow(2, nBits) - 2;
+      const minHosts = Math.pow(2, nBits - 1) - 1;
+      const reqPCs = rand(minHosts + 2, maxHosts - 1);
 
-      if (!useIPAndPCs) {
-        // Caso 3: IP + Máscara (incluyendo ej. 15.12.89.58 con 255.255.0.0 -> 2^8 = 256 subredes)
-        const prefix = chosenClass === 'A' ? pick([16, 17, 18, 19, 20, 22, 24, 28]) : pick([24, 25, 26, 27, 28, 29, 30]);
-        const mask = prefixToMask(prefix);
-        const mBits = prefix - basePrefix;
-        const subnets = Math.pow(2, mBits);
-
-        return {
-          type: 5, subMode: 'ipAndMaskTrap', idPrefix, ip, chosenClass, basePrefix, baseMask, prefix, mask, mBits, subnets,
-          title: '🔥 Cálculo de Subredes con IP y Máscara (La Clase Manda)',
-          questionHtml: `Se tiene la dirección IP <span class="highlight">${ip}</span> con la máscara <span class="highlight">${Math.random() > 0.25 ? mask : '/' + prefix}</span>.<br>Como te dan la IP, <strong>su Clase manda</strong>. ¿Cuántos bits prestados (M) hay en total desde su máscara original y cuántas <strong>subredes</strong> se obtienen?`,
-          fields: [
-            { id: `${idPrefix}_mbits`, label: 'Bits Prestados Totales (M)', placeholder: 'Ej: 8, 12, 13, 20', answer: String(mBits), norm: v => v.replace(/\D/g, '') },
-            { id: `${idPrefix}_sub`, label: 'Cantidad de Subredes (2^M)', placeholder: 'Ej: 256 o 4096', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
-          ]
-        };
-      } else {
-        // Caso 4 (NUEVO DEL REPASO): IP + Cantidad de IPs -> Hallar máscara, comparar con Clase de la IP y hallar Subredes
-        const nBits = chosenClass === 'A' ? pick([11, 12, 13, 14, 15]) : pick([6, 7, 9, 10, 11, 12, 13, 14, 15]);
-        const prefix = 32 - nBits;
-        const mask = prefixToMask(prefix);
-        const mBits = prefix - basePrefix;
-        const subnets = Math.pow(2, mBits);
-        const maxHosts = Math.pow(2, nBits) - 2;
-        const minHosts = Math.pow(2, nBits - 1) - 1;
-        const reqPCs = rand(minHosts + 10, maxHosts - 2);
-
-        return {
-          type: 5, subMode: 'ipAndPCsTrap', idPrefix, ip, reqPCs, nBits, chosenClass, basePrefix, baseMask, prefix, mask, mBits, subnets,
-          title: '🔥 Pregunta de Examen: IP Base + Cantidad de IPs → Subredes',
-          questionHtml: `Se tiene la IP <span class="highlight">${ip}</span> para <span class="highlight-warn">${reqPCs.toLocaleString('es-PE')} IPs (hosts)</span>.<br>Calcula primero la máscara necesaria, compárala con la Clase de la IP dada y determina cuántas <strong>subredes (2^M)</strong> se tendrá:`,
-          fields: [
-            { id: `${idPrefix}_pref`, label: '1. Prefijo de Máscara (/X)', placeholder: 'Ej: /19 o /17', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
-            { id: `${idPrefix}_mbits`, label: '2. Bits Prestados desde su Clase (M)', placeholder: 'Ej: 11 o 1', answer: String(mBits), norm: v => v.replace(/\D/g, '') },
-            { id: `${idPrefix}_sub`, label: '3. Cantidad de Subredes (2^M)', placeholder: 'Ej: 2048 o 2', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
-          ]
-        };
-      }
+      return {
+        type: 5, subMode: 'ipAndPCsTrap', idPrefix, ip, reqPCs, nBits, chosenClass, basePrefix, baseMask, prefix, mask, mBits, subnets,
+        title: '🔥 Pregunta de Examen: IP Base + Cantidad de IPs → Subredes',
+        questionHtml: `Se tiene la IP <span class="highlight">${ip}</span> para <span class="highlight-warn">${reqPCs.toLocaleString('es-PE')} IPs (hosts)</span>.<br>Calcula primero la máscara necesaria, compárala con la Clase de la IP dada y determina cuántas <strong>subredes (2^M)</strong> se tendrá:`,
+        fields: [
+          { id: `${idPrefix}_pref`, label: '1. Prefijo de Máscara (/X)', placeholder: 'Ej: /19 o /17', answer: '/' + prefix, norm: v => '/' + v.replace(/\D/g, '') },
+          { id: `${idPrefix}_mbits`, label: '2. Bits Prestados desde su Clase (M)', placeholder: 'Ej: 11 o 1', answer: String(mBits), norm: v => v.replace(/\D/g, '') },
+          { id: `${idPrefix}_sub`, label: '3. Cantidad de Subredes (2^M)', placeholder: 'Ej: 2048 o 2', answer: String(subnets), norm: v => v.replace(/\D/g, '') }
+        ]
+      };
     }
   }
 
-  // MODO 6: DIRECCIONAMIENTO IPv6 (COMPRESIÓN ÓPTIMA CISCO Y TIPOS)
+  // MODO 6: DIRECCIONAMIENTO IPv6 (8 ESCENARIOS VARIADOS DE COMPRESIÓN CISCO Y TIPOS)
   if (type === 6) {
-    const askTypeToo = (diff >= 1 && Math.random() > 0.4);
-    const ipv6Types = [
-      { code: 'GUA', label: 'GUA (Global Unicast)', firstPool: ['2001', '2002', '2009', '2800', '2fff', '3000', '3fff'] },
-      { code: 'ULA', label: 'ULA (Local Única)', firstPool: ['fc00', 'fd00', 'fd12', 'fdff'] },
-      { code: 'LLA', label: 'LLA (Link-Local)', firstPool: ['fe80'] }
-    ];
-    const chosenType = pick(ipv6Types);
-    const h0 = pick(chosenType.firstPool);
-    const hexPool = ['0001', '0002', '0010', '0015', '00ab', '0100', '09f0', '0a00', '0db8', '0fea', '1234', '2000', '2345', 'aaaa'];
+    const scenario = forcedScenario || drawFromDeck('deck_mode6', [
+      'single_block_mid', 'single_block_end', 'long_zeros_6',
+      'two_blocks_first_bigger', 'two_blocks_second_bigger',
+      'tie_2_vs_2_cisco_left', 'tie_1_vs_1_cisco_left', 'no_double_colon_only_lead'
+    ]);
 
-    let hextets = [h0];
+    const ipv6Types = [
+      { code: 'GUA', label: 'GUA (Global Unicast 2000-3fff)', firstPool: ['2001', '2002', '2009', '2800', '2fff', '3000', '3fff'] },
+      { code: 'ULA', label: 'ULA (Local Única fc00-fdff)', firstPool: ['fc00', 'fd00', 'fd12', 'fdff'] },
+      { code: 'LLA', label: 'LLA (Link-Local fe80)', firstPool: ['fe80'] },
+      { code: 'RESERVADO', label: 'Reservado (4000 en adelante, no válido para Internet)', firstPool: ['4000', '4001', '5000'] }
+    ];
+    const chosenType = drawFromDeck('deck_v6_types', ipv6Types);
+    const h0 = pick(chosenType.firstPool);
+    const hexPool = ['0001', '0002', '0009', '0010', '0015', '00ab', '0100', '09f0', '0a00', '0db8', '0fea', '1234', '2000', '4a00', 'ef01'];
+    const rHex = () => pick(hexPool);
+
+    let hextets = [];
     let scenarioNote = '';
 
-    if (diff === 0) {
-      const zeroStart = rand(2, 4);
-      const zeroLen = rand(2, 3);
-      for (let i = 1; i < 8; i++) {
-        if (i >= zeroStart && i < zeroStart + zeroLen) hextets.push('0000');
-        else hextets.push(pick(hexPool));
-      }
-      scenarioNote = 'Tiene un único bloque contiguo de hextetos de ceros para usar "::".';
-    } else if (diff === 1) {
-      const firstIsBigger = Math.random() > 0.5;
-      if (firstIsBigger) {
-        hextets = [h0, pick(hexPool), '0000', '0000', pick(hexPool), pick(hexPool), '0000', pick(hexPool)];
-        scenarioNote = 'Hay dos bloques de ceros separados: el primero tiene 2 hextetos de ceros y el segundo solo 1. Gana el más largo.';
-      } else {
-        hextets = [h0, pick(hexPool), '0000', pick(hexPool), pick(hexPool), '0000', '0000', pick(hexPool)];
-        scenarioNote = 'Hay dos bloques de ceros separados: el primero tiene solo 1 hexteto de ceros y el segundo tiene 2. Gana el segundo por comprimir más ceros.';
-      }
+    if (scenario === 'single_block_mid') {
+      hextets = [h0, rHex(), '0000', '0000', '0000', rHex(), rHex(), rHex()];
+      scenarioNote = 'Un bloque contiguo de 3 hextetos de ceros al medio reemplazado por "::".';
+    } else if (scenario === 'single_block_end') {
+      hextets = [h0, rHex(), rHex(), rHex(), '0000', '0000', '0000', rHex()];
+      scenarioNote = 'Un bloque contiguo de 3 hextetos de ceros hacia el final reemplazado por "::".';
+    } else if (scenario === 'long_zeros_6') {
+      // Como el ejemplo 2002:0000:0000:0000:0000:0000:0000:0001 -> 2002::1
+      hextets = [h0, '0000', '0000', '0000', '0000', '0000', '0000', pick(['0001', '0002', '0010'])];
+      scenarioNote = 'Seis bloques consecutivos de ceros se comprimen en un solo "::" (como el ejemplo 2002::1 de clase).';
+    } else if (scenario === 'two_blocks_first_bigger') {
+      hextets = [h0, '0000', '0000', '0000', rHex(), '0000', '0000', rHex()];
+      scenarioNote = 'Dos cadenas de ceros separadas (3 bloques a la izquierda vs 2 a la derecha). Se aplica "::" en la más larga (izquierda) y la otra queda ":0:0:".';
+    } else if (scenario === 'two_blocks_second_bigger') {
+      hextets = [h0, rHex(), '0000', rHex(), '0000', '0000', '0000', rHex()];
+      scenarioNote = 'Dos cadenas de ceros separadas (1 bloque a la izquierda vs 3 a la derecha). Gana la de la derecha por comprimir más ceros.';
+    } else if (scenario === 'tie_2_vs_2_cisco_left') {
+      // Como 3000:0000:0000:0fea:0000:0000:2000:0010 -> 3000::fea:0:0:2000:10
+      hextets = [h0, '0000', '0000', rHex(), '0000', '0000', rHex(), rHex()];
+      scenarioNote = '¡Empate de 2 bloques vs 2 bloques! Por regla de Cisco se comprime con "::" el primero de izquierda a derecha, y el segundo queda ":0:0:".';
+    } else if (scenario === 'tie_1_vs_1_cisco_left') {
+      hextets = [h0, rHex(), '0000', rHex(), rHex(), '0000', rHex(), rHex()];
+      scenarioNote = '¡Empate de 1 hexteto "0000" vs 1 hexteto "0000"! Por regla de Cisco se pone "::" en el de la izquierda y ":0:" en el de la derecha.';
     } else {
-      hextets = [h0, '0000', '0000', pick(hexPool), '0000', '0000', pick(hexPool), pick(hexPool)];
-      scenarioNote = '¡Empate de bloques de ceros! Ambos tienen dos "0000" seguidos. Por regla de Cisco, "::" se aplica al primer bloque de izquierda a derecha, y el otro queda como ":0:0:".';
+      // Sin bloques 0000 (solo omitir ceros a la izquierda, como el ejercicio 12.2.4 de NetAcad)
+      hextets = [h0, rHex(), rHex(), rHex(), rHex(), rHex(), rHex(), rHex()];
+      scenarioNote = 'Ningún hexteto es "0000", así que solo se aplica la Regla 1 (omitir los ceros a la izquierda en cada hexteto, sin usar "::").';
     }
 
     const fullIPv6 = hextets.join(':');
     const compRes = compressIPv6Cisco(hextets);
 
     let fields = [
-      { id: `${idPrefix}_ipv6`, label: 'IPv6 Comprimida Óptima (Formato Cisco)', placeholder: 'Ej: 2001:db8::1234:10', answer: compRes.compressed, norm: v => v.trim().toLowerCase() }
-    ];
-
-    if (askTypeToo) {
-      fields.push({
+      { id: `${idPrefix}_ipv6`, label: '1. IPv6 Comprimida Óptima (Estándar Cisco)', placeholder: 'Ej: 2001:db8::1234:10', answer: compRes.compressed, norm: v => v.trim().toLowerCase() },
+      {
         id: `${idPrefix}_v6type`,
-        label: 'Tipo IPv6 (Escribe: GUA, ULA o LLA)',
-        placeholder: 'GUA / ULA / LLA',
+        label: '2. Tipo IPv6 (GUA, ULA, LLA o Reservado)',
+        placeholder: 'GUA / ULA / LLA / Reservado',
         answer: chosenType.code,
         norm: v => {
           const s = v.trim().toUpperCase();
-          if (s.includes('GLOBAL') || s === 'GUA') return 'GUA';
-          if (s.includes('UNICA') || s.includes('ÚNICA') || s === 'ULA') return 'ULA';
+          if (s.includes('GLOBAL') || s === 'GUA' || s === 'PUBLICA' || s === 'PÚBLICA') return 'GUA';
+          if (s.includes('UNICA') || s.includes('ÚNICA') || s === 'ULA' || s === 'PRIVADA') return 'ULA';
           if (s.includes('LINK') || s.includes('ENLACE') || s === 'LLA' || s === 'FE80') return 'LLA';
+          if (s.includes('RES') || s.includes('4000') || s.includes('INV')) return 'RESERVADO';
           return s;
         }
-      });
-    }
+      }
+    ];
 
     return {
-      type: 6, idPrefix, fullIPv6, hextets, compRes, chosenType, askTypeToo, scenarioNote,
-      title: 'Compresión Óptima de IPv6 (Estándar Cisco)',
-      questionHtml: `Comprime al <strong>formato más óptimo (más corto según Cisco)</strong> la siguiente dirección IPv6 de 128 bits:<br><span class="highlight-warn">${fullIPv6}</span>${askTypeToo ? '<br><small style="color:#94a3b8;">Además indica su tipo mirando el 1er hexteto: <strong>GUA</strong> (Global 2000-3fff), <strong>ULA</strong> (Local Única fc00-fdff) o <strong>LLA</strong> (Link-Local fe80).</small>' : ''}`,
+      type: 6, idPrefix, fullIPv6, hextets, compRes, chosenType, askTypeToo: true, scenarioNote,
+      title: 'Compresión Óptima de IPv6 y Clasificación (Cisco)',
+      questionHtml: `Comprime al <strong>formato más óptimo (según las reglas de Cisco)</strong> la siguiente dirección IPv6 de 128 bits:<br><span class="highlight-warn">${fullIPv6}</span><br><small style="color:#94a3b8;">Además clasifícala según su 1er hexteto (<code>${h0}</code>): <strong>GUA</strong> (2000-3fff), <strong>ULA</strong> (fc00-fdff), <strong>LLA</strong> (fe80) o <strong>Reservado</strong> (4000+).</small>`,
       fields
     };
   }
 
-  // TIPO 11 (EXCLUSIVO PARA EXAMEN PRO): LA TRAMPA DEL GATEWAY DEL PROFESOR (Packet Tracer)
+  // TIPO 11: LA TRAMPA DEL GATEWAY DEL PROFESOR (Packet Tracer)
   if (type === 11) {
-    const prefix = pick([27, 28, 29, 30]);
+    const prefix = drawFromDeck('deck_m11_pref', [26, 27, 28, 29, 30]);
     const nBits = 32 - prefix;
     const step = Math.pow(2, nBits);
     const mask = prefixToMask(prefix);
-    const reqPCs = rand(Math.max(2, Math.pow(2, nBits - 1) + 1), Math.pow(2, nBits) - 2);
+    const reqPCs = nBits === 2 ? 2 : rand(Math.pow(2, nBits - 1) + 1, Math.pow(2, nBits) - 2);
 
-    const o3 = rand(1, 50);
+    const o3 = rand(1, 80);
     const mult = rand(1, Math.floor(220 / step)) * step;
-    const givenHostOctet = mult + rand(2, step - 2);
+    const givenHostOctet = nBits === 2 ? mult + 2 : mult + rand(2, step - 2);
     const ipGiven = `192.168.${o3}.${givenHostOctet}`;
     const netBase = `192.168.${o3}.${mult}`;
     const gatewayIp = `192.168.${o3}.${mult + 1}`;
@@ -986,22 +997,27 @@ function evaluateProblem(prob) {
 
 function getFullExplanationHtml(p) {
   if (p.type === 7) {
-    return `• <strong>${p.item.ones} unos</strong> en binario es <code>${p.item.bin}</code> y equivale en decimal a <strong><code>${p.item.dec}</code></strong> ${p.item.step > 0 ? `(su último bit encendido vale ${p.item.step})` : ''}.`;
+    return `• <strong>${p.item.ones} unos</strong> en binario es <code>${p.item.bin}</code> y equivale en decimal a <strong><code>${p.item.dec}</code></strong> ${p.item.step > 0 ? `(su último bit encendido / salto vale <strong>${p.item.step}</strong>)` : ''}.`;
   } else if (p.type === 8) {
     if (p.subType === 'andLogic') {
       return `• IP <code>${p.num}</code> = <code>${p.binStr}</code> (${p.sumBreakdown}).<br>• Máscara <code>${p.maskDec}</code> = <code>${p.maskBin}</code>.<br>• Al multiplicar bit por bit (1 con 1 da 1) queda <code>${p.andBin}</code> = <strong><code>${p.andResult}</code></strong>.`;
+    } else if (p.subType === 'multiples') {
+      return `• En la máscara <code>${p.maskDec}</code> el último bit encendido vale <strong>${p.step}</strong>. Los múltiplos de ${p.step} van de ${p.step} en ${p.step}, y el más cercano a <code>${p.num}</code> sin pasarse es <strong><code>${p.netVal}</code></strong> (el siguiente sería ${p.nextVal}).`;
     }
-    return `• En binario de 8 bits, <code>${p.binStr}</code> enciende los pesos: <strong><code>${p.sumBreakdown}</code></strong>.`;
+    return `• En binario de 8 bits (<code>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</code>), <code>${p.binStr}</code> suma: <strong><code>${p.sumBreakdown}</code></strong>.`;
   } else if (p.type === 1) {
+    if (p.subMode === 'classDE') {
+      return `• El primer octeto es <code>${p.o1}</code>: Rango Clase D (224-239) es reservado para tráfico <strong>Multicast</strong> y Clase E (240-255) es reservado para <strong>Pruebas (NASA)</strong>. No son asignables a PCs.`;
+    }
     const privExp = p.isPriv
       ? `Es <strong>PRIVADO</strong> porque está dentro del rango privado de Clase ${p.chosen} (<code>10.x.x.x</code>, <code>172.16-31.x.x</code> o <code>192.168.x.x</code>).`
-      : `Es <strong>PÚBLICO</strong> porque está fuera de los 3 rangos privados.`;
+      : `Es <strong>PÚBLICO</strong> porque está fuera de los 3 rangos privados (${p.o1}.${p.o2}.x.x).`;
     if (p.subMode === 'customMaskTrap') {
       return `• <strong>Clase ${p.chosen}:</strong> Por el 1er octeto (<code>${p.o1}</code>).<br>• <strong>¡La Máscara Manda!:</strong> Como te dieron <code>${p.givenMask}</code>, la Porción de Red es <code><strong>${p.netPortion}</strong></code> y la de Host es <code><strong>${p.hostPortion}</strong></code>.<br>• ${privExp}`;
     }
     return `• <strong>Clase ${p.chosen}:</strong> 1er octeto es <code>${p.o1}</code> | <strong>Máscara:</strong> <code>${p.defMask}</code> | <strong>Red:</strong> <code>${p.netPortion}</code> | <strong>Host:</strong> <code>${p.hostPortion}</code>.<br>• ${privExp}`;
   } else if (p.type === 2) {
-    return `• El prefijo <strong>/${p.prefix}</strong> equivale a <strong>${p.mask}</strong> (${p.bitsInActive} bits encendidos en el octeto #${p.activeOctetIdx + 1} = <code>${p.octVal}</code>).`;
+    return `• El prefijo <strong>/${p.prefix}</strong> equivale a <strong>${p.mask}</strong> (${p.bitsInActive} bits encendidos en el octeto #${p.activeOctetIdx + 1} = <code>${p.octVal}</code>, último bit/salto = <code>${p.step}</code>, ceros sobrantes = <code>${p.zeros}</code>).`;
   } else if (p.type === 3) {
     if (p.subType === 'maskToHosts') {
       return `• Máscara <code>/${p.prefix}</code> deja <code>N = ${p.zeros} ceros</code> &rarr; <code>2^${p.zeros} - 2 = <strong>${p.totalHosts.toLocaleString('es-PE')} hosts</strong></code>.`;
@@ -1020,7 +1036,8 @@ function getFullExplanationHtml(p) {
     }
   } else if (p.type === 6) {
     return `• <strong>Paso 1 (Sin ceros a la izquierda):</strong> <code>${p.compRes.noLead}</code><br>
-            • <strong>Paso 2 (Regla "::" de Cisco):</strong> ${p.scenarioNote} Resultado óptimo: <strong><code>${p.compRes.compressed}</code></strong>.${p.askTypeToo ? `<br>• <strong>Tipo IPv6:</strong> Empieza con <code>${p.hextets[0]}</code> &rarr; <strong>${p.chosenType.label}</strong>.` : ''}`;
+            • <strong>Paso 2 (Regla "::" de Cisco):</strong> ${p.scenarioNote} Resultado óptimo: <strong><code>${p.compRes.compressed}</code></strong>.<br>
+            • <strong>Tipo IPv6:</strong> Empieza con <code>${p.hextets[0]}</code> &rarr; <strong>${p.chosenType.label}</strong>.`;
   } else if (p.type === 11) {
     return `• Para ${p.reqPCs} IPs la potencia es <code>2^${p.nBits}</code> &rarr; Prefijo <code>/${p.prefix}</code> (<code>${p.mask}</code>). El salto va de <strong>${p.step} en ${p.step}</strong>. El múltiplo más cercano a <code>${p.ipGiven}</code> es la Red Base <code><strong>${p.netBase}</strong></code>, y su Primer IP válido (Gateway) es <code><strong>${p.gatewayIp}</strong></code>.`;
   } else {
@@ -1032,23 +1049,28 @@ function getFullExplanationHtml(p) {
 function getHintsHtml(p, res) {
   let h = '';
   if (p.type === 7) {
-    h += `<div class="hint-item">✗ Recuerda la tabla de bits encendidos de izquierda a derecha: <code>1=128, 2=192, 3=224, 4=240, 5=248, 6=252, 7=254, 8=255</code>.</div>`;
+    h += `<div class="hint-item">✗ Recuerda la tabla de bits encendidos de izquierda a derecha: <code>1=128 (salto 128), 2=192 (salto 64), 3=224 (salto 32), 4=240 (salto 16), 5=248 (salto 8), 6=252 (salto 4), 7=254 (salto 2), 8=255 (salto 1)</code>.</div>`;
   } else if (p.type === 8) {
-    h += `<div class="hint-item">✗ Usa el tablero azul de arriba: los pesos de las 8 posiciones son <code>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</code>. Haz clic en los cuadros hasta armar el número.</div>`;
+    h += `<div class="hint-item">✗ Los pesos de los 8 bits de izquierda a derecha son: <code>128 | 64 | 32 | 16 | 8 | 4 | 2 | 1</code>. En Lógica AND solo da 1 cuando ambos bits son 1.</div>`;
   } else if (p.type === 1) {
+    if (p.subMode === 'classDE') {
+      h += `<div class="hint-item">✗ Revisa el primer número (<code>${p.o1}</code>): de 224 a 239 es <strong>Clase D (Multicast)</strong> y de 240 a 255 es <strong>Clase E (Pruebas / NASA)</strong>.</div>`;
+      return h;
+    }
     if (!res[`${p.idPrefix}_class`]) h += `<div class="hint-item">✗ <strong>Clase:</strong> Mira el primer número (<code>${p.o1}</code>). A: 1-127, B: 128-191, C: 192-223.</div>`;
     if (p.subMode === 'standard' && !res[`${p.idPrefix}_mask`]) h += `<div class="hint-item">✗ <strong>Máscara:</strong> Clase A lleva un 255 (<code>255.0.0.0</code>), Clase B dos 255 (<code>255.255.0.0</code>), Clase C tres 255 (<code>255.255.255.0</code>).</div>`;
     if (!res[`${p.idPrefix}_net`]) h += `<div class="hint-item">✗ <strong>Porción de Red:</strong> ${p.subMode === 'customMaskTrap' ? `¡Cuidado! Te dieron la máscara explícita <code>${p.givenMask}</code>; aquí <strong>la máscara manda</strong> sobre la clase.` : `Copia los octetos de la IP donde la máscara por defecto tiene <code>255</code>.`}</div>`;
     if (!res[`${p.idPrefix}_host`]) h += `<div class="hint-item">✗ <strong>Porción de Host:</strong> Copia los octetos de la IP donde la máscara ${p.subMode === 'customMaskTrap' ? `dada (<code>${p.givenMask}</code>)` : 'por defecto'} tiene <code>0</code>.</div>`;
     if (!res[`${p.idPrefix}_priv`]) h += `<div class="hint-item">✗ <strong>Privado vs Público:</strong> Solo son Privadas: <code>10.x.x.x</code>, <code>172.16.0.0 a 172.31.255.255</code> y <code>192.168.x.x</code>. Revisa bien el 1er y 2do octeto (<code>${p.o1}.${p.o2}</code>).</div>`;
   } else if (p.type === 2) {
-    h += `<div class="hint-item">✗ Tienes ${p.activeOctetIdx} octetos con 255 (${p.activeOctetIdx * 8} bits) y <strong>${p.bitsInActive} bits encendidos</strong> en el octeto #${p.activeOctetIdx + 1}. Revisa en la tabla cuánto valen ${p.bitsInActive} unos.</div>`;
+    h += `<div class="hint-item">✗ Tienes ${p.activeOctetIdx} octetos con 255 (${p.activeOctetIdx * 8} bits) y <strong>${p.bitsInActive} bits encendidos</strong> en el octeto #${p.activeOctetIdx + 1}. Revisa en la tabla cuánto valen ${p.bitsInActive} unos y recuerda que el total de bits es 32.</div>`;
   } else if (p.type === 3) {
     if (p.subType === 'maskToHosts') {
       h += `<div class="hint-item">✗ La máscara equivale a <code>/${p.prefix}</code>. Resta <code>32 - ${p.prefix}</code> para hallar los ceros (N) y calcula <code>2^N - 2</code>.</div>`;
     } else {
       if (!res[`${p.idPrefix}_pref`]) h += `<div class="hint-item">✗ <strong>Prefijo:</strong> Busca qué potencia <code>2^N - 2</code> cubre ${p.reqPCs.toLocaleString('es-PE')} PCs y resta <code>32 - N</code>.</div>`;
       if (!res[`${p.idPrefix}_mask`]) h += `<div class="hint-item">✗ <strong>Máscara Decimal:</strong> Convierte el prefijo <code>/${p.prefix}</code> a decimal usando la tabla de bits.</div>`;
+      if (res[`${p.idPrefix}_cap`] === false) h += `<div class="hint-item">✗ <strong>Capacidad Máxima:</strong> Calcula exactamente <code>2^${p.nBits} - 2</code>.</div>`;
     }
   } else if (p.type === 5) {
     if (p.subMode === 'maskOnly') {
@@ -1066,7 +1088,7 @@ function getHintsHtml(p, res) {
     }
   } else if (p.type === 6) {
     if (!res[`${p.idPrefix}_ipv6`]) h += `<div class="hint-item">✗ <strong>Compresión IPv6:</strong> 1) Quita los ceros a la izquierda de cada hexteto (pero nunca los de la derecha). 2) Usa <code>::</code> <strong>una sola vez</strong> en la secuencia de ceros más larga (si hay empate, usa <code>::</code> en el bloque de la <strong>izquierda</strong> y pon <code>:0:</code> en el otro).</div>`;
-    if (p.askTypeToo && !res[`${p.idPrefix}_v6type`]) h += `<div class="hint-item">✗ <strong>Tipo IPv6:</strong> Mira el 1er hexteto (<code>${p.hextets[0]}</code>): <code>2000-3fff</code> es <strong>GUA</strong>, <code>fc00-fdff</code> es <strong>ULA</strong>, <code>fe80</code> es <strong>LLA</strong>.</div>`;
+    if (!res[`${p.idPrefix}_v6type`]) h += `<div class="hint-item">✗ <strong>Tipo IPv6:</strong> Mira el 1er hexteto (<code>${p.hextets[0]}</code>): <code>2000-3fff</code> es <strong>GUA</strong>, <code>fc00-fdff</code> es <strong>ULA</strong>, <code>fe80</code> es <strong>LLA</strong> y de <code>4000</code> en adelante es <strong>Reservado</strong>.</div>`;
   } else if (p.type === 11) {
     if (!res[`${p.idPrefix}_mask`]) h += `<div class="hint-item">✗ <strong>Máscara:</strong> Para ${p.reqPCs} IPs necesitas <code>2^${p.nBits} - 2</code> &rarr; prefijo <code>/${p.prefix}</code>. Pásalo a decimal.</div>`;
     if (!res[`${p.idPrefix}_net`]) h += `<div class="hint-item">✗ <strong>Red Base Real:</strong> Con prefijo <code>/${p.prefix}</code> las redes saltan de <strong>${p.step} en ${p.step}</strong>. Busca el múltiplo de ${p.step} más cercano sin pasarte.</div>`;
@@ -1091,26 +1113,10 @@ function generateSingleExercise() {
   btnSolve.textContent = 'Ver Solución Completa';
   btnSolve.classList.remove('showing');
 
-  if (currentMode === 8) resetBoardBits();
-
   singleProblem = createProblemData(currentMode, 'single');
   document.getElementById('question').innerHTML = singleProblem.questionHtml;
   document.getElementById('inputs').innerHTML = renderFieldsHtml(singleProblem.fields);
   document.getElementById('feedback').style.display = 'none';
-
-  // Si estamos en Modo 8 y la pregunta da un binario para pasar a decimal, precargamos los bits en el tablero para que lo vea visualmente
-  if (currentMode === 8 && singleProblem.subType === 'binToDec') {
-    boardBits = singleProblem.binStr.split('').map(Number);
-    for (let i = 0; i < 8; i++) {
-      const btn = document.getElementById('bbit_' + i);
-      if (btn) {
-        btn.textContent = boardBits[i];
-        btn.classList.toggle('on', boardBits[i] === 1);
-      }
-    }
-    const sumEl = document.getElementById('board_sum_display');
-    if (sumEl) sumEl.textContent = '?';
-  }
 
   const firstInput = document.querySelector('#inputs input');
   if (firstInput) firstInput.focus();
@@ -1129,11 +1135,6 @@ function checkSingle() {
   const evalRes = evaluateProblem(singleProblem);
   fbEl.className = 'feedback ' + (evalRes.allOk ? 'ok' : 'bad');
   fbEl.innerHTML = evalRes.html;
-
-  if (currentMode === 8 && evalRes.allOk) {
-    boardBits = singleProblem.binStr.split('').map(Number);
-    updateBoardUI();
-  }
 }
 
 function toggleSolutionSingle() {
@@ -1152,11 +1153,6 @@ function toggleSolutionSingle() {
       st.className = 'field-status status-sol';
       st.innerHTML = '★ Solución mostrada';
     });
-
-    if (currentMode === 8) {
-      boardBits = singleProblem.binStr.split('').map(Number);
-      updateBoardUI();
-    }
 
     showingSolutionSingle = true;
     btnSolve.textContent = 'Ocultar Solución (Volver a mis respuestas)';
@@ -1201,37 +1197,40 @@ function generateExam() {
   document.getElementById('exam_score_banner').style.display = 'none';
   const titleBar = document.getElementById('exam_title_bar');
   titleBar.innerHTML = isPro
-    ? `<span style="color:#f43f5e;">🔥 SIMULACRO DE EXAMEN NIVEL PRO (10 Preguntas con Trampas: Máscara Manda, Priv/Púb, Subredes con IP+PCs e IPv6 Cisco)</span>`
-    : `<span style="color:#a78bfa;">📝 SIMULACRO DE EXAMEN NIVEL NORMAL (10 Preguntas de todas las Secciones de Semana 9 y 10)</span>`;
+    ? `<span style="color:#f43f5e;">🔥 SIMULACRO DE EXAMEN NIVEL PRO (10 Preguntas: Máscara Manda, Trampas Priv/Púb, Subredes con IP+PCs, Empates IPv6 y Gateway)</span>`
+    : `<span style="color:#a78bfa;">📝 SIMULACRO DE EXAMEN NIVEL NORMAL (10 Preguntas Variadas de Semana 9 y 10)</span>`;
 
   let specs = [];
   if (!isPro) {
     specs = [
-      { t: 1, d: 0 }, { t: 1, d: 1 },
-      { t: 2, d: 0 },
-      { t: 3, d: 0 }, { t: 3, d: 1 },
-      { t: 4, d: 0 }, { t: 4, d: 1 },
-      { t: 5, d: 0 }, { t: 5, d: 1 },
-      { t: 6, d: 0 }
+      { t: 1, s: 'priv_B' },
+      { t: 1, s: 'pub_C_trap' },
+      { t: 2, s: 'prefToDecAndStep' },
+      { t: 3, s: 'maskToHosts_pref' },
+      { t: 3, s: 'hostsToMask' },
+      { t: 4, s: 'oct4_mask' },
+      { t: 4, s: 'oct3_pref' },
+      { t: 5, s: 'maskOnly_classless' },
+      { t: 5, s: 'pcsToSubnets' },
+      { t: 6, s: 'single_block_mid' }
     ];
   } else {
     specs = [
-      { t: 1, d: 2 },
-      { t: 2, d: 2 },
-      { t: 3, d: 2 },
-      { t: 4, d: 2 }, { t: 4, d: 2 },
-      { t: 5, d: 2 }, { t: 5, d: 2 },
-      { t: 6, d: 1 }, { t: 6, d: 2 },
-      { t: 11, d: 2 }
+      { t: 1, s: 'custom_mask_overrides' },
+      { t: 1, s: 'pub_B_trap' },
+      { t: 2, s: 'decToPrefAndZeros' },
+      { t: 3, s: 'hostsToMask_exactCap' },
+      { t: 4, s: 'oct3_pcs' },
+      { t: 4, s: 'oct2_pcs' },
+      { t: 5, s: 'ipAndMask_ClassA' },
+      { t: 5, s: 'ipAndPCs_ClassB' },
+      { t: 6, s: 'tie_2_vs_2_cisco_left' },
+      { t: 11, s: null }
     ];
   }
 
-  for (let i = specs.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [specs[i], specs[j]] = [specs[j], specs[i]];
-  }
-
-  examProblems = specs.map((s, idx) => createProblemData(s.t, `ex_q${idx}`, s.d));
+  specs = shuffleArray(specs);
+  examProblems = specs.map((item, idx) => createProblemData(item.t, `ex_q${idx}`, item.s));
 
   const container = document.getElementById('exam_questions_container');
   container.innerHTML = examProblems.map((p, idx) => `
